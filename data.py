@@ -42,3 +42,10 @@ def read_raw(count=-1):
     classes = read_classes()
     return [(p.name, cv2.imread(str(p)), bboxes[p.name], classes[p.name])
             for p in islice(config.images_paths, count)]
+
+
+def get_hog_features(img):
+    # TODO: check and adjust hog parameters, input image size itp.
+    img = cv2.resize(img, (128, 128))
+    hog = cv2.HOGDescriptor()
+    return hog.compute(img)
