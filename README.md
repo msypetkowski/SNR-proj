@@ -4,6 +4,9 @@ SNR project
 Dependencies
 ------------
 
+###Arch linux packages:
+opencv
+
 Dataset
 ------------
 Data should be like this (with default path):
