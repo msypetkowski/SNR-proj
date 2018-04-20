@@ -13,6 +13,7 @@ class BaseConfig:
     data_labels = data_root_path.joinpath('image_class_labels.txt')
     images_paths = list(map(Path, glob.glob(
         str(data_root_path.joinpath('SET_C')) + '/**/*.jpg')))
+    classes_count = 50
 
 
 config = BaseConfig

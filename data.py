@@ -2,8 +2,10 @@
 Utilities for reading and preparing data.
 """
 from itertools import islice
+import random
 
 import cv2
+import numpy as np
 
 from config import config
 
@@ -34,14 +36,49 @@ def read_classes():
 
 
 def read_raw(count=-1):
-    """ Returns list of tuples (hash, tensor, class, bounding_box)
+    """ Returns list of tuples (image_filename, tensor, class, bounding_box)
     """
     if count == -1:
         count = len(config.images_paths)
     bboxes = read_bboxes()
     classes = read_classes()
-    return [(p.name, cv2.imread(str(p)), bboxes[p.name], classes[p.name])
+    return [(p.name, cv2.imread(str(p)), classes[p.name], bboxes[p.name])
             for p in islice(config.images_paths, count)]
+
+
+def get_class_mapping(raw_data):
+    """ Returns dict int -> int.
+    Classes in raw_data may have values from non-continous range.
+    """
+    _, _, classes, _ = zip(*raw_data)
+    return {cls:i for i,cls in enumerate(np.unique(classes))}
+
+
+def map_classes(raw_data):
+    """ Changes classes, so that they are subsequent numbers
+    from 0 to config.classes_count
+    """
+    mapping = get_class_mapping(raw_data)
+    return [(fn, img, mapping[cls], bbox) for fn, img, cls, bbox in raw_data]
+
+
+def process_one_example(name, image, cls, bbox, rand=random.Random()):
+    x, y, w, h = bbox
+    img = image[y:y+w, x:x+w]
+    label = np.zeros(config.classes_count)
+    assert 0 <= cls < config.classes_count
+    label[cls] = 1.0
+    return img, cls
+
+
+def example_generator(raw_data, random_seed=123):
+    """ Yields examples - pairs (prepared_image, cls_vec)
+    Does data augmentation.
+    """
+    rand = random.Random(123)
+    rand.shuffle(raw_data)
+    for ex in raw_data:
+        yield process_one_example(*ex)
 
 
 def get_hog_features(img):
