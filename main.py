@@ -30,12 +30,15 @@ def data_preview(args):
         print(name, cls, bbox)
 
     # display data
-    _,images,_, _ = zip(*data)
-    show_image(merge_images([cv2.resize(i, (100, 100)) for i in images]))
+    # _, images, _, _ = zip(*data)
+    # show_image(merge_images([cv2.resize(i, (100, 100)) for i in images]))
 
     # display prepared
     images, _ = zip(*starmap(process_one_example, data))
     show_image(merge_images([cv2.resize(i, (100, 100)) for i in images]))
+
+    # display hog
+    show_image(merge_images([get_hog_features(i) for i in images]))
 
 
 def main(args):
