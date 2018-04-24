@@ -86,7 +86,7 @@ def example_generator(raw_data, random_seed=123):
 def get_hog_features(img):
     # TODO: check and adjust hog parameters, input image size itp.
 
-    img = cv2.resize(img, (256, 256))
+    img = cv2.resize(img, (128, 128))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     _, hog_image = hog(gray, orientations=8, pixels_per_cell=(8, 8),
                         cells_per_block=(8, 8), visualise=True)
