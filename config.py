@@ -14,6 +14,8 @@ class BaseConfig:
     images_paths = list(map(Path, glob.glob(
         str(data_root_path.joinpath('SET_C')) + '/**/*.jpg')))
     classes_count = 50
+    random_seed = 123
+    hog_feature_size = 1024
 
 
 config = BaseConfig
