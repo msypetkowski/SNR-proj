@@ -12,7 +12,7 @@ class Config(BaseConfig):
     model_img_features_shape = (BaseConfig.hog_feature_size,)
     model_labels_shape = (BaseConfig.classes_count,)
     model_output_shape = model_labels_shape
-    batch_size = 32
+    batch_size = 128
     validation_size = 1000
 
 
@@ -41,12 +41,21 @@ class Model:
         with tf.variable_scope('Model', initializer=initializer):
             self._model_output, summaries = self._create_model(img_features)
             self._summaries.extend(summaries)
+            self._prediction = tf.nn.softmax(self._model_output, axis=1)
 
         with tf.variable_scope('ModelLoss'):
             self._loss = tf.nn.softmax_cross_entropy_with_logits(
                 logits=self._model_output, labels=labels, name="XEntWithLogits")
             self._loss = tf.reduce_mean(self._loss)
+
             self._summaries.append(tf.summary.scalar('Loss', self._loss))
+            self._valid_summaries.append(self._summaries[-1])
+
+        with tf.name_scope('AccuracyStat'):
+            is_correct = tf.equal(tf.argmax(self._prediction, 1),
+                                  tf.argmax(labels, 1))
+            accuracy = tf.reduce_mean(tf.cast(is_correct, tf.float32))
+            self._summaries.append(tf.summary.scalar('Accuracy', accuracy))
             self._valid_summaries.append(self._summaries[-1])
 
         self._summaries.append(tf.summary.scalar('LearningRate', learning_rate))
@@ -68,7 +77,7 @@ class Model:
     def _create_model(self, img_features):
         summary = []
         # TODO: experiment
-        layers = [512, 256, 128, 64]
+        layers = [512, 256, 196, 128, 64]
         r = img_features
         for l in layers:
             r = self._batchnorm_wrapper(tf.layers.dense(r, l, use_bias=False))
@@ -82,7 +91,7 @@ class Model:
         return [self._valid_summaries]
 
     def eval_op(self):
-        return [self._model_output]
+        return [self._prediction]
 
 
 def main(args):
@@ -119,8 +128,11 @@ def main(args):
         i = 0
         try:
             for i in range(100000):
-                print(i)
-                lr *= 0.5 ** (1 / 200)
+                print('step', i)
+
+                # decrease lr by 50% in 2000 iterations
+                lr *= 0.5 ** (1 / 2000)
+
                 img, lbl = next(batch_generator)
                 summaries = sess.run(model.train_op(), {
                     img_features: img,
