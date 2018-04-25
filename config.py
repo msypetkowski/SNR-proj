@@ -16,6 +16,7 @@ class BaseConfig:
     classes_count = 50
     random_seed = 123
     hog_feature_size = 1024
+    raw_image_size = 256
 
 
 config = BaseConfig

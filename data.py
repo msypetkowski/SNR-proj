@@ -40,13 +40,18 @@ def read_classes():
 
 
 def preprocess_raw_image(img, bbox, extend_ratio=0.6):
-    """ Crop with extended bbox and downscale.
+    """ Crop with extended bbox and downscale too large images.
     """
     x, y, w, h = bbox
-    dx , dy = [round(i * extend_ratio) for i in (w, h)]
+    dx, dy = [round(i * extend_ratio) for i in (w, h)]
     x, y = x - dx, y - dy
     w, h = w + dx*2, h + dy*2
-    return img[max(y, 0):y + h, max(x, 0):x + w]
+    ret = img[max(y, 0):y + h, max(x, 0):x + w]
+    min_dim = min(ret.shape[:2])
+    ratio = min_dim / config.raw_image_size
+    if ratio > 1:
+        return ret
+    return cv2.resize(ret, tuple([round(i * ratio) for i in ret.shape[1::-1]]))
 
 
 def map_classes(raw_data):
