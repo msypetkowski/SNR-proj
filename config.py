@@ -15,8 +15,8 @@ class BaseConfig:
         str(data_root_path.joinpath('SET_C')) + '/**/*.jpg')))
     classes_count = 50
     random_seed = 123
-    hog_feature_size = 1024
-    raw_image_size = 256
+    hog_feature_size = 3780
+    raw_image_size = 196
 
 
 config = BaseConfig

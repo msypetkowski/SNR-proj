@@ -6,12 +6,12 @@ from itertools import islice, groupby, chain, repeat, cycle, starmap
 
 import cv2
 import numpy as np
-from skimage.feature import hog
 
 from config import config
-from utils import transposed_group
 from img_process import transform_img
-
+from utils import transposed_group
+# from skimage.feature import hog
+from visualization import *
 
 
 def to_filename(name):
@@ -45,11 +45,11 @@ def preprocess_raw_image(img, bbox, extend_ratio=0.6):
     x, y, w, h = bbox
     dx, dy = [round(i * extend_ratio) for i in (w, h)]
     x, y = x - dx, y - dy
-    w, h = w + dx*2, h + dy*2
+    w, h = w + dx * 2, h + dy * 2
     ret = img[max(y, 0):y + h, max(x, 0):x + w]
     min_dim = min(ret.shape[:2])
-    ratio = min_dim / config.raw_image_size
-    if ratio > 1:
+    ratio = config.raw_image_size / min_dim
+    if ratio >= 1:
         return ret
     return cv2.resize(ret, tuple([round(i * ratio) for i in ret.shape[1::-1]]))
 
@@ -72,7 +72,7 @@ def read_raw(count=-1):
     # TODO: consider not including bboxes, since they are not used
     # nor are proper for the preprocessedd images
     ret = [(p.name, preprocess_raw_image(cv2.imread(str(p)), bboxes[p.name]), classes[p.name], bboxes[p.name])
-            for p in islice(config.images_paths, count)]
+           for p in islice(config.images_paths, count)]
     return map_classes(ret)
 
 
@@ -89,19 +89,30 @@ def get_hog_features(img, feat_size=config.hog_feature_size):
     """
     # TODO: check and adjust hog parameters, input image size itp.
 
-    img = cv2.resize(img, (128, 128))
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, hog_image = hog(gray, orientations=8, pixels_per_cell=(8, 8),
-                       cells_per_block=(8, 8), visualise=True)
+    img = cv2.resize(img, (64, 128))
 
+    # TODO: maybe consider experimenting and making visualizations with this
+    # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # fd, hog_image = hog(img, orientations=4, pixels_per_cell=(8, 8),
+    #                    cells_per_block=(8, 8), visualise=True)
     # img = cv2.resize(img, (128, 128))
-    # hog = cv2.HOGDescriptor()
-    # return hog.compute(img)
 
-    # TODO: find a good way for adjusting feature size
-    # (but this doesn't seem to be that bad)
-    rand = np.random.RandomState(config.random_seed)
-    return rand.choice(hog_image.flatten(), feat_size)
+    # this is standard/default/well known/frequently used hog fd for images 128x64x3
+    # output size is 3780
+    hog = cv2.HOGDescriptor()
+    fd = hog.compute(img)
+    fd = fd.flatten()
+    assert fd.shape == (config.hog_feature_size, )
+
+    if len(fd) != feat_size:
+        # TODO: find a good way for adjusting feature size
+        # (but this doesn't seem to be that bad)
+        # or maybe just assume that this len(fd) == feat_size
+        raise NotImplementedError
+        # rand = np.random.RandomState(config.random_seed)
+        # return rand.choice(fd, feat_size)
+    else:
+        return fd
 
 
 def process_one_example(name, img, cls, bbox, rand=random.Random(), use_hog=True):

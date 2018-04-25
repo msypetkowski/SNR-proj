@@ -1,5 +1,6 @@
 """
-TODO: model, training loop etc.
+TODO: more visualizations - hog images, training and test set,
+precission-recall plot, etc.
 """
 import argparse
 from itertools import starmap
@@ -19,6 +20,8 @@ def parse_arguments():
                         dest='view_data', action='store_true', default=False)
     parser.add_argument('-c', '--view-count', help='How much images should be viewed',
                         dest='view_count', type=int, default=36)
+    parser.add_argument('--hog', help='View hog feature vectors',
+                        dest='view_hog', action='store_true', default=False)
 
     return parser.parse_args()
 
@@ -34,12 +37,12 @@ def data_preview(args):
         _, images, _, _ = zip(*d)
         show_image(merge_images([cv2.resize(i, (150, 150)) for i in images]))
 
-        # display prepared images (not hog features)
-        images, _ = zip(*starmap(lambda *args: process_one_example(*args, use_hog=False), d))
+        # display prepared images
+        images, _ = zip(*starmap(lambda *args1: process_one_example(*args1, use_hog=args.view_hog), d))
         show_image(merge_images([cv2.resize(i, (150, 150)) for i in images]))
 
-    # display hog
-    # show_image(merge_images([get_hog_features(i) for i in images]))
+        # display hog
+        # show_image(merge_images([get_hog_features(i) for i in images]))
 
 
 def main(args):
