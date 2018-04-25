@@ -10,6 +10,8 @@ from skimage.feature import hog
 
 from config import config
 from utils import transposed_group
+from img_process import transform_img
+
 
 
 def to_filename(name):
@@ -86,19 +88,20 @@ def get_hog_features(img, feat_size=config.hog_feature_size):
     return rand.choice(hog_image.flatten(), feat_size)
 
 
-def process_one_example(name, image, cls, bbox, rand=random.Random()):
+def process_one_example(name, image, cls, bbox, rand=random.Random(), use_hog=True):
     x, y, w, h = bbox
     img = image[y:y + w, x:x + w]
+    img = transform_img(img, rand)
     # TODO: data augmentation
     label = np.zeros(config.classes_count)
     assert 0 <= cls < config.classes_count
     label[cls] = 1.0
     assert label.shape == (config.classes_count,)
-    return get_hog_features(img), label
+    return (get_hog_features(img) if use_hog else img), label
 
 
 def example_generator(raw_data, random_seed=123):
-    """ Yields examples infinitely - pairs (img_feature_vec, cls_vec)
+    """ Yields feed-ready examples infinitely - pairs (img_feature_vec, cls_vec)
     Does data augmentation.
     """
     rand = random.Random(random_seed)
