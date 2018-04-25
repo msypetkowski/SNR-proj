@@ -25,7 +25,7 @@ def flip_img(img, random):
     random <  0.5 -> horizontal
     random >= 0.5 -> vertical
     """
-    img = cv2.flip(img, round(random))
+    img = cv2.flip(img, round(random), 1)
     return img
 
 
@@ -49,8 +49,10 @@ def transform_img(img, rand):
     :param img: image to be transformed
     :param rand: random generator
     """
-    img = flip_img(img,rand.random())
-    img = crop_img(img, [rand.random() for _ in range(4)])
+    # img = flip_img(img,rand.random())
+    r = [rand.random() for _ in range(4)]
+    # TODO: consider doing sometching to avoid cutting bird's head
+    img = crop_img(img, r)
     return rotate_img(img, rand.random())
 
 

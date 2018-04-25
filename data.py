@@ -39,25 +39,14 @@ def read_classes():
             for name, cls in read_table(config.data_labels, 2)}
 
 
-def read_raw(count=-1):
-    """ Returns list of tuples (image_filename, tensor, class, bounding_box)
+def preprocess_raw_image(img, bbox, extend_ratio=0.6):
+    """ Crop with extended bbox and downscale.
     """
-    if count == -1:
-        count = len(config.images_paths)
-    bboxes = read_bboxes()
-    classes = read_classes()
-    # TODO: downsample the image initially, because subsampling later takes too long
-    # remember also about bboxes
-    return [(p.name, cv2.imread(str(p)), classes[p.name], bboxes[p.name])
-            for p in islice(config.images_paths, count)]
-
-
-def get_class_mapping(raw_data):
-    """ Returns dict int -> int.
-    Classes in raw_data may have values from non-continuous range.
-    """
-    _, _, classes, _ = zip(*raw_data)
-    return {cls: i for i, cls in enumerate(np.unique(classes))}
+    x, y, w, h = bbox
+    dx , dy = [round(i * extend_ratio) for i in (w, h)]
+    x, y = x - dx, y - dy
+    w, h = w + dx*2, h + dy*2
+    return img[max(y, 0):y + h, max(x, 0):x + w]
 
 
 def map_classes(raw_data):
@@ -66,6 +55,28 @@ def map_classes(raw_data):
     """
     mapping = get_class_mapping(raw_data)
     return [(fn, img, mapping[cls], bbox) for fn, img, cls, bbox in raw_data]
+
+
+def read_raw(count=-1):
+    """ Returns list of tuples (image_filename, tensor, class, bounding_box)
+    """
+    if count == -1:
+        count = len(config.images_paths)
+    bboxes = read_bboxes()
+    classes = read_classes()
+    # TODO: consider not including bboxes, since they are not used
+    # nor are proper for the preprocessedd images
+    ret = [(p.name, preprocess_raw_image(cv2.imread(str(p)), bboxes[p.name]), classes[p.name], bboxes[p.name])
+            for p in islice(config.images_paths, count)]
+    return map_classes(ret)
+
+
+def get_class_mapping(raw_data):
+    """ Returns dict int -> int.
+    Classes in raw_data may have values from non-continuous range.
+    """
+    _, _, classes, _ = zip(*raw_data)
+    return {cls: i for i, cls in enumerate(np.unique(classes))}
 
 
 def get_hog_features(img, feat_size=config.hog_feature_size):
@@ -88,9 +99,7 @@ def get_hog_features(img, feat_size=config.hog_feature_size):
     return rand.choice(hog_image.flatten(), feat_size)
 
 
-def process_one_example(name, image, cls, bbox, rand=random.Random(), use_hog=True):
-    x, y, w, h = bbox
-    img = image[y:y + w, x:x + w]
+def process_one_example(name, img, cls, bbox, rand=random.Random(), use_hog=True):
     img = transform_img(img, rand)
     # TODO: data augmentation
     label = np.zeros(config.classes_count)
@@ -114,7 +123,6 @@ def get_train_validation_raw(validation_ratio):
     """ Returns pair (train_raw_data, validation_raw_data)
     """
     raw_data = read_raw()
-    raw_data = map_classes(raw_data)
     rand = random.Random(123)
     rand.shuffle(raw_data)
     raw_data.sort(key=lambda x: x[2])
