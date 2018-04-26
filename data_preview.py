@@ -4,12 +4,14 @@ precission-recall plot, etc.
 """
 import argparse
 from itertools import starmap
+from pathlib import Path
 
 import cv2
 from data import *
-from visualization import merge_images_with_border, show_image
+from visualization import merge_images_with_border, show_image, make_border
 from utils import group
-from main2 import config
+from train import config
+from eval import predict_classes
 
 
 def parse_arguments():
@@ -21,7 +23,7 @@ def parse_arguments():
                         dest='view_raw', action='store_true', default=False)
     parser.add_argument('-t', '--test', help='View whole testset',
                         dest='view_test', action='store_true', default=False)
-    parser.add_argument('-n', '--train', help='View trainset',
+    parser.add_argument('--train', help='View trainset',
                         dest='view_train', action='store_true', default=False)
     parser.add_argument('-a', '--augmentation', help='Show augmentation on an example',
                         dest='augmentation', action='store_true', default=False)
@@ -30,6 +32,14 @@ def parse_arguments():
                         dest='view_hog', action='store_true', default=False)
     parser.add_argument('-c', '--view-count', help='How much images should be viewed (generic parameter)',
                         dest='view_count', type=int, default=36)
+
+    # additional parameters for --test
+    parser.add_argument('-e', '--eval', help='Evaluate with trained nn and show true/false answers.',
+                        dest='eval', action='store_true', default=False)
+    parser.add_argument('-m', '--model-dir', help='Model dir',
+                        dest='model_dir', type=Path, required=False)
+    parser.add_argument('-n', '--model-name', help='Model name',
+                        dest='model_name', type=str, required=False)
 
     return parser.parse_args()
 
@@ -51,9 +61,20 @@ def view_raw(args):
 def view_test(args):
     _, test_data = get_train_validation_raw(config.validation_raw_examples_ratio)
     test_data = get_unaugmented(test_data, use_hog=args.view_hog)
-    images, _ = test_data
-    show_image(merge_images_with_border([cv2.resize(i, (100, 100)) for i in images]))
-    # show_image(merge_images_with_border(images))
+    images, labels = test_data
+    if args.eval:
+        if not args.model_dir or not args.model_name:
+            raise ValueError("Reguired model-dir and model-name for testset evaluation.")
+        features = [get_hog_features(img) for img in images]
+        prediction = predict_classes(args, features)
+        is_correct = [np.argmax(lbl) == np.argmax(pred) for lbl, pred in zip(labels, prediction)]
+        assert len(is_correct) == len(images)
+        images = [make_border(img, color=(int(cor) * 255, 0, int(not cor) * 255))
+                    for img, cor in zip(images, is_correct)]
+        show_image(merge_images(images, scale=0.5))
+    else:
+        # show_image(merge_images_with_border([cv2.resize(i, (100, 100)) for i in images]))
+        show_image(merge_images_with_border(images))
 
 
 def view_train(args):

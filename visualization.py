@@ -29,11 +29,11 @@ def merge_images(images, scale=1):
                             int(vis.shape[0] * scale)))
 
 
-def makeBorder(img, thickness=10, color=(0, 0, 0)):
+def make_border(img, thickness=10, color=(0, 0, 0)):
     return cv2.copyMakeBorder(img, *[thickness] * 4, cv2.BORDER_CONSTANT, value=color)
 
 def merge_images_with_border(images):
-    return merge_images(list(map(makeBorder, images)))
+    return merge_images(list(map(make_border, images)))
 
 def draw_bbox(img, bbox):
     x, y, w, h = bbox

@@ -1,0 +1,70 @@
+\documentclass[a4paper]{article}
+
+\usepackage[a4paper,  margin=1.0in]{geometry}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+
+
+\usepackage[utf8]{inputenc}
+\begin{document}
+
+
+\title{SNR classes project - birds species recognition using deep neural networks}
+
+\author{Michał Sypetkowski, Marcin Lew, Filip Smurawa}
+\maketitle
+
+\section{Data}
+Training set is divided with ratio 0.1 (for testset)
+so that number of examples of each class is equal in both training and test set.
+In the end we got 300 examples for test set and 2700 raw examples for training set.
+
+TODO: more
+
+\section{HOG features}
+TODO: mention used parameters, show visualization on an example
+
+
+\section{Data augmentation}
+Augmented examples for example shown on figure \ref{fig:aug1}
+are shown on figure \ref{fig:aug2}.
+
+TODO: describe data augmentation
+
+\begin{figure}[h]
+    \caption[]{Not augmented example}
+    \centering
+    \includegraphics[page=2,width=0.1\textwidth]{aug1.png}
+    \label{fig:aug1}
+\end{figure}
+
+\begin{figure}[h]
+    \caption[]{Augmented examples}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{aug2.png}
+    \label{fig:aug2}
+\end{figure}
+
+\section{Model architecture}
+
+TODO: experiment more and describe selected architecture
+
+\section{Results}
+Results on testset are shown on figure \ref{fig:eval}.
+
+\begin{figure}[h]
+    \caption[]{Results on testset (blue - good answers)}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{eval.png}
+    \label{fig:eval}
+\end{figure}
+
+\section{What we are planning to do next}
+Use deep convolutional network and feed whole images
+(not extracted features e.g. with HOG).
+With our implementation, such experiment requires only a few very simple modifications.
+
+
+\end{document}

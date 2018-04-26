@@ -34,9 +34,9 @@ config = Config
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Multilayer perceptron training for birds recogntion.')
     parser.add_argument('-m', '--model-dir', help='Model dir',
-                        dest='modelDir', type=Path, required=True)
+                        dest='model_dir', type=Path, required=True)
     parser.add_argument('-n', '--model-name', help='Model name',
-                        dest='modelName', type=str, required=True)
+                        dest='model_name', type=str, required=True)
     return parser.parse_args()
 
 
@@ -120,12 +120,12 @@ def main(args):
         sess.run(tf.global_variables_initializer())
 
         # setup saving summaries and checkpoints
-        model_dir = str(args.modelDir.joinpath(args.modelName))
+        model_dir = str(args.model_dir.joinpath(args.model_name))
         writer = tf.summary.FileWriter(model_dir)
         writer.add_graph(sess.graph)
         writer_save_ratio = 5
 
-        validation_dir = str(args.modelDir.joinpath(args.modelName + '_validation'))
+        validation_dir = str(args.model_dir.joinpath(args.model_name + '_validation'))
         validation_writer = tf.summary.FileWriter(validation_dir)
 
         saver = tf.train.Saver()

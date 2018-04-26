@@ -115,7 +115,7 @@ def get_hog_features(img, feat_size=config.hog_feature_size):
     """
     # TODO: check and adjust hog parameters, input image size itp.
 
-    img = cv2.resize(img, (64, 128))
+    img = cv2.resize(img, (64, 128), cv2.INTER_LINEAR)
 
     # TODO: maybe consider experimenting and making visualizations with this
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -154,7 +154,7 @@ def process_one_example(name, img, cls, bbox, rand=random.Random(), use_hog=True
     return (get_hog_features(img) if use_hog else cv2.resize(img, tuple([config.feed_ready_image_size] * 2))), label
 
 
-def example_generator(raw_data, random_seed=123, use_hog=True):
+def example_generator(raw_data, random_seed=123, use_hog=True, augment=True):
     """ Yields feed-ready examples infinitely - pairs (img_feature_vec, cls_vec)
     Does data augmentation.
     """
@@ -162,7 +162,7 @@ def example_generator(raw_data, random_seed=123, use_hog=True):
     while True:
         rand.shuffle(raw_data)
         for ex in raw_data:
-            yield process_one_example(*ex, use_hog=use_hog)
+            yield process_one_example(*ex, use_hog=use_hog, augment=augment)
 
 
 def get_train_validation_raw(validation_ratio):
@@ -183,11 +183,11 @@ def get_train_validation_raw(validation_ratio):
             sum([c[:split_index] for c in by_class], []))
 
 
-def batch_generator(raw_data, batch_size, use_hog=True):
+def batch_generator(raw_data, batch_size, use_hog=True, augment=True):
     """ Yields pairs of lists (images_features, labels)
     """
     return starmap(lambda x, y: (np.array(x), np.array(y)), transposed_group(
-        example_generator(raw_data, random_seed=config.random_seed, use_hog=use_hog),
+        example_generator(raw_data, random_seed=config.random_seed, use_hog=use_hog, augment=augment),
         batch_size))
 
 
