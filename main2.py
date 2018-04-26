@@ -14,6 +14,7 @@ class Config(BaseConfig):
     model_output_shape = model_labels_shape
     batch_size = 128
     validation_size = 1000
+    hidden_size = [512, 256, 196, 128, 64]
 
 
 config = Config
@@ -45,7 +46,7 @@ class Model:
 
         with tf.variable_scope('ModelLoss'):
             self._loss = tf.nn.softmax_cross_entropy_with_logits(
-                logits=self._model_output, labels=labels, name="XEntWithLogits")
+                logits=self._model_output, labels=labels)
             self._loss = tf.reduce_mean(self._loss)
 
             self._summaries.append(tf.summary.scalar('Loss', self._loss))
@@ -60,9 +61,12 @@ class Model:
 
         self._summaries.append(tf.summary.scalar('LearningRate', learning_rate))
 
+        # update batchnorm EMAs before updating weights (in one feed)
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope='Model')):
             with tf.name_scope('Optimizer'):
                 optimizer = tf.train.AdamOptimizer(learning_rate)
+
+                # clip gradients to avoid nans
                 gradients, variables = zip(*optimizer.compute_gradients(
                     self._loss, var_list=tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='Model')))
                 gradients, _ = tf.clip_by_global_norm(gradients, 1.0)
@@ -76,10 +80,8 @@ class Model:
 
     def _create_model(self, img_features):
         summary = []
-        # TODO: experiment
-        layers = [512, 256, 196, 128, 64]
         r = img_features
-        for l in layers:
+        for l in config.hidden_size:
             r = self._batchnorm_wrapper(tf.layers.dense(r, l, use_bias=False))
         r = tf.layers.dense(r, config.model_output_shape[0])
         return r, summary
@@ -99,8 +101,9 @@ def main(args):
         img_features = tf.placeholder(tf.float32, (None,) + config.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + config.model_labels_shape, name='ImgLabels')
         learning_rate = tf.placeholder(tf.float32, name='LearningRate')
+        is_training = tf.placeholder(tf.bool, shape=(), name='IsTraining')
 
-        model = Model(img_features, labels, learning_rate, is_training=True)
+        model = Model(img_features, labels, learning_rate, is_training=is_training)
         sess.run(tf.global_variables_initializer())
 
         # setup saving summaries and checkpoints
@@ -111,11 +114,10 @@ def main(args):
 
         validation_dir = str(args.modelDir.joinpath(args.modelName + '_validation'))
         validation_writer = tf.summary.FileWriter(validation_dir)
-        validation_writer.add_graph(sess.graph)
 
         saver = tf.train.Saver()
-        saver_save_ratio = 100
-        validation_ratio = 10
+        saver_save_ratio = 200
+        validation_ratio = 20
 
         # setup input data
         train_data, test_data = data.get_train_validation_raw(0.1)
@@ -138,7 +140,13 @@ def main(args):
                     img_features: img,
                     labels: lbl,
                     learning_rate: lr,
+                    is_training: True,
                 })[0]
+
+                if i % writer_save_ratio == 0:
+                    writer.add_summary(summaries, i)
+                if i % saver_save_ratio == 0:
+                    saver.save(sess, model_dir, global_step=i)
 
                 if i % validation_ratio == 0:
                     img, lbl = validation_set
@@ -146,15 +154,12 @@ def main(args):
                         img_features: img,
                         labels: lbl,
                         learning_rate: lr,
+                        is_training: False,
                     })[0]
                     validation_writer.add_summary(summaries, i)
                     writer.flush()
                     validation_writer.flush()
 
-                if i % writer_save_ratio == 0:
-                    writer.add_summary(summaries, i)
-                if i % saver_save_ratio == 0:
-                    saver.save(sess, model_dir, global_step=i)
 
         except KeyboardInterrupt:
             saver.save(sess, model_dir, global_step=i)
