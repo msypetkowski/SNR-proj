@@ -29,10 +29,25 @@ def merge_images(images, scale=1):
                             int(vis.shape[0] * scale)))
 
 
-def show_image(img):
+def makeBorder(img, thickness=10, color=(0, 0, 0)):
+    return cv2.copyMakeBorder(img, *[thickness] * 4, cv2.BORDER_CONSTANT, value=color)
+
+def merge_images_with_border(images):
+    return merge_images(list(map(makeBorder, images)))
+
+def draw_bbox(img, bbox):
+    x, y, w, h = bbox
+    cv2.rectangle(img, (x, y), (x+w, y+h), color=(0, 0, 255), thickness=3)
+    return img
+
+
+def show_image(img, bbox=None):
     """ Show image and wait for key.
     Returns pressed key code.
     """
+    if bbox is not None:
+        img = img.copy()
+        draw_bbox(img, bbox)
     cv2.imshow('img', img)
     key = cv2.waitKey(0)
     cv2.destroyAllWindows()

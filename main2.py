@@ -21,13 +21,11 @@ class Config(BaseConfig):
 
     # validation config
     validation_raw_examples_ratio = 0.1
-    validation_set_size = 1000
 
     # model config
     hidden_size = [256, 196, 128, 64]
     weights_init_stddev =  0.02
-    enable_batchnorm = False
-
+    enable_batchnorm = True
 
 
 config = Config
@@ -137,8 +135,7 @@ def main(args):
         # setup input data
         train_data, test_data = data.get_train_validation_raw(config.validation_raw_examples_ratio)
         batch_generator = iter(data.batch_generator(train_data, config.batch_size))
-        validation_set = list(islice(data.batch_generator(
-                         test_data, batch_size=config.validation_set_size), 1))[0]
+        validation_set = data.get_unaugmented(test_data)
 
         # measure time
         start_time = time.time()

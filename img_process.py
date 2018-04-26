@@ -44,12 +44,14 @@ def rotate_img(img, random):
     img = img[y:y+h, x:x+w]
     return img
 
+
 def transform_img(img, rand):
     """ Randomly transforms image
     :param img: image to be transformed
     :param rand: random generator
     """
-    # img = flip_img(img,rand.random())
+    if (rand.random() < 0.5):
+        img = flip_img(img, 1)
     r = [rand.random() for _ in range(4)]
     # TODO: consider doing sometching to avoid cutting bird's head
     img = crop_img(img, r)

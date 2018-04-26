@@ -2,7 +2,7 @@
 Utilities for reading and preparing data.
 """
 import random
-from itertools import islice, groupby, chain, repeat, cycle, starmap
+from itertools import islice, groupby, chain, repeat, starmap
 
 import cv2
 import numpy as np
@@ -39,19 +39,42 @@ def read_classes():
             for name, cls in read_table(config.data_labels, 2)}
 
 
+def crop_image(image, crop_bbox, orig_bbox):
+    """ Returns pair: new_image, new_bbox
+    """
+    x, y, w, h = crop_bbox
+    y1 = max(y, 0)
+    x1 = max(x, 0)
+    img = image[y1:y + h, x1:x + w]
+
+    ox, oy, ow, oh = orig_bbox
+    new_bbox = (ox - x1, oy - y1, ow, oh)
+    return img, new_bbox
+
+
+def scale_image(image, target_size, orig_bbox):
+    """ Returns pair: new_image, new_bbox
+    """
+    min_dim = min(image.shape[:2])
+    ratio = target_size / min_dim
+    if ratio >= 1:
+        return image, orig_bbox
+    img = cv2.resize(image, tuple([round(i * ratio) for i in image.shape[1::-1]]))
+    new_bbox = tuple(map(lambda x: round(float(x)), (np.array(orig_bbox) * ratio)))
+    return img, new_bbox
+
+
 def preprocess_raw_image(img, bbox, extend_ratio=0.6):
     """ Crop with extended bbox and downscale too large images.
+    Returns pair: new_image, new_bbox
     """
     x, y, w, h = bbox
     dx, dy = [round(i * extend_ratio) for i in (w, h)]
     x, y = x - dx, y - dy
     w, h = w + dx * 2, h + dy * 2
-    ret = img[max(y, 0):y + h, max(x, 0):x + w]
-    min_dim = min(ret.shape[:2])
-    ratio = config.raw_image_size / min_dim
-    if ratio >= 1:
-        return ret
-    return cv2.resize(ret, tuple([round(i * ratio) for i in ret.shape[1::-1]]))
+    img, bbox = crop_image(img, (x,y,w,h), bbox)
+    img, bbox = scale_image(img, config.raw_image_size, bbox)
+    return img, bbox
 
 
 def map_classes(raw_data):
@@ -71,8 +94,11 @@ def read_raw(count=-1):
     classes = read_classes()
     # TODO: consider not including bboxes, since they are not used
     # nor are proper for the preprocessedd images
-    ret = [(p.name, preprocess_raw_image(cv2.imread(str(p)), bboxes[p.name]), classes[p.name], bboxes[p.name])
+    ret = [(p.name, cv2.imread(str(p)), classes[p.name], bboxes[p.name])
            for p in islice(config.images_paths, count)]
+    ret = [[(name, new_img , cls, new_bbox)  # where:
+            for new_img, new_bbox in (preprocess_raw_image(img, bbox),)][0]
+                for name, img, cls, bbox in ret]
     return map_classes(ret)
 
 
@@ -115,24 +141,28 @@ def get_hog_features(img, feat_size=config.hog_feature_size):
         return fd
 
 
-def process_one_example(name, img, cls, bbox, rand=random.Random(), use_hog=True):
-    img = transform_img(img, rand)
+def process_one_example(name, img, cls, bbox, rand=random.Random(), use_hog=True, augment=True):
+    """ Returns feed-ready pair (img_feature_vec, cls_vec).
+    """
+    if augment:
+        img = transform_img(img, rand)
     # TODO: data augmentation
     label = np.zeros(config.classes_count)
     assert 0 <= cls < config.classes_count
     label[cls] = 1.0
     assert label.shape == (config.classes_count,)
-    return (get_hog_features(img) if use_hog else img), label
+    return (get_hog_features(img) if use_hog else cv2.resize(img, tuple([config.feed_ready_image_size] * 2))), label
 
 
-def example_generator(raw_data, random_seed=123):
+def example_generator(raw_data, random_seed=123, use_hog=True):
     """ Yields feed-ready examples infinitely - pairs (img_feature_vec, cls_vec)
     Does data augmentation.
     """
     rand = random.Random(random_seed)
-    rand.shuffle(raw_data)
-    for ex in cycle(raw_data):
-        yield process_one_example(*ex)
+    while True:
+        rand.shuffle(raw_data)
+        for ex in raw_data:
+            yield process_one_example(*ex, use_hog=use_hog)
 
 
 def get_train_validation_raw(validation_ratio):
@@ -153,9 +183,20 @@ def get_train_validation_raw(validation_ratio):
             sum([c[:split_index] for c in by_class], []))
 
 
-def batch_generator(raw_data, batch_size):
+def batch_generator(raw_data, batch_size, use_hog=True):
     """ Yields pairs of lists (images_features, labels)
     """
     return starmap(lambda x, y: (np.array(x), np.array(y)), transposed_group(
-        example_generator(raw_data),
+        example_generator(raw_data, random_seed=config.random_seed, use_hog=use_hog),
         batch_size))
+
+
+def get_unaugmented(raw_data, use_hog=True):
+    """ Returns pair of list (images_features, labels) set of cropped with bboxes images.
+    """
+    ret = []
+    for filename, img, cls, bbox in raw_data:
+        cropped_img, new_bbox = crop_image(img, bbox, bbox)
+        ret.append((process_one_example(
+            filename, cropped_img, cls, new_bbox, use_hog=use_hog, augment=False)))
+    return list(zip(*ret))

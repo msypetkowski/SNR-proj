@@ -17,6 +17,7 @@ class BaseConfig:
     random_seed = 123
     hog_feature_size = 3780
     raw_image_size = 196
+    feed_ready_image_size = 128  # for convolution and visualization
 
 
 config = BaseConfig
