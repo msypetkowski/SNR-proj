@@ -1,4 +1,5 @@
 import argparse
+import time
 from itertools import islice
 from pathlib import Path
 
@@ -12,16 +13,28 @@ class Config(BaseConfig):
     model_img_features_shape = (BaseConfig.hog_feature_size,)
     model_labels_shape = (BaseConfig.classes_count,)
     model_output_shape = model_labels_shape
+
+    # training config
     batch_size = 128
-    validation_size = 1000
-    hidden_size = [512, 256, 196, 128, 64]
+    initial_lr = 0.01
+    lr_decay = 0.5 ** (1 / 2000)  # decrease lr by 50% in 2000 iterations
+
+    # validation config
+    validation_raw_examples_ratio = 0.1
+    validation_set_size = 1000
+
+    # model config
+    hidden_size = [256, 196, 128, 64]
+    weights_init_stddev =  0.02
+    enable_batchnorm = False
+
 
 
 config = Config
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='GAN test')
+    parser = argparse.ArgumentParser(description='Multilayer perceptron training for birds recogntion.')
     parser.add_argument('-m', '--model-dir', help='Model dir',
                         dest='modelDir', type=Path, required=True)
     parser.add_argument('-n', '--model-name', help='Model name',
@@ -37,7 +50,7 @@ class Model:
         self._summaries = []
         self._valid_summaries = []
 
-        initializer = tf.truncated_normal_initializer(0, 0.02)
+        initializer = tf.truncated_normal_initializer(0, config.weights_init_stddev)
 
         with tf.variable_scope('Model', initializer=initializer):
             self._model_output, summaries = self._create_model(img_features)
@@ -75,14 +88,16 @@ class Model:
         self._summaries = tf.summary.merge(self._summaries)
         self._valid_summaries = tf.summary.merge(self._valid_summaries)
 
-    def _batchnorm_wrapper(self, layer, activation=tf.nn.relu):
-        return activation(tf.layers.batch_normalization(layer, training=self._is_training))
+    def _layer_wrapper(self, layer, activation=tf.nn.relu):
+        if config.enable_batchnorm:
+            layer = tf.layers.batch_normalization(layer, training=self._is_training)
+        return activation(layer)
 
     def _create_model(self, img_features):
         summary = []
         r = img_features
         for l in config.hidden_size:
-            r = self._batchnorm_wrapper(tf.layers.dense(r, l, use_bias=False))
+            r = self._layer_wrapper(tf.layers.dense(r, l, use_bias=False))
         r = tf.layers.dense(r, config.model_output_shape[0])
         return r, summary
 
@@ -120,22 +135,28 @@ def main(args):
         validation_ratio = 20
 
         # setup input data
-        train_data, test_data = data.get_train_validation_raw(0.1)
+        train_data, test_data = data.get_train_validation_raw(config.validation_raw_examples_ratio)
         batch_generator = iter(data.batch_generator(train_data, config.batch_size))
         validation_set = list(islice(data.batch_generator(
-                         test_data, batch_size=config.validation_size), 1))[0]
+                         test_data, batch_size=config.validation_set_size), 1))[0]
+
+        # measure time
+        start_time = time.time()
+        data_generation_time_sum = 0
 
         # training loop
-        lr = 0.1
+        lr = config.initial_lr
         i = 0
         try:
             for i in range(100000):
                 print('step', i)
+                lr *= config.lr_decay
 
-                # decrease lr by 50% in 2000 iterations
-                lr *= 0.5 ** (1 / 2000)
-
+                # generate next batch
+                start_generation_time = time.time()
                 img, lbl = next(batch_generator)
+                data_generation_time_sum += time.time() - start_generation_time
+
                 summaries = sess.run(model.train_op(), {
                     img_features: img,
                     labels: lbl,
@@ -163,6 +184,11 @@ def main(args):
 
         except KeyboardInterrupt:
             saver.save(sess, model_dir, global_step=i)
+
+        t = time.time() - start_time
+        print('global training time:', str(t) + "s")
+        print('waited for batch generation:', str(data_generation_time_sum) + "s")
+        print('ratio:', data_generation_time_sum / t)
 
 
 if __name__ == '__main__':
