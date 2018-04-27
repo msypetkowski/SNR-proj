@@ -60,13 +60,12 @@ def view_raw(args):
 
 
 def view_test(args):
-    _, test_data = get_train_validation_raw(config.validation_raw_examples_ratio)
-    test_data = get_unaugmented(test_data, use_hog=args.view_hog)
-    images, labels = test_data
+    _, raw_test_data = get_train_validation_raw(config.validation_raw_examples_ratio)
+    images, _ = get_unaugmented(raw_test_data, use_hog=args.view_hog)
+    features, labels = get_unaugmented(raw_test_data, use_hog=True)
     if args.eval:
         if not args.model_dir or not args.model_name:
             raise ValueError("Reguired model-dir and model-name for testset evaluation.")
-        features = [get_hog_features(img) for img in images]
         prediction = predict_classes(args, features, labels)
         is_correct = [np.argmax(lbl) == np.argmax(pred) for lbl, pred in zip(labels, prediction)]
         assert len(is_correct) == len(images)
