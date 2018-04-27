@@ -17,13 +17,20 @@
 \maketitle
 
 \section{Data}
-Training set is divided with ratio 0.1 (for testset)
-so that number of examples of each class is equal in both training and test set.
-In the end we got 300 examples for test set and 2700 raw examples for training set.
+The data set consist of 50 subsets – types of bird species. Each subset is a set of 60 different pictures. Altogether it gives us a data set of 3000 pictures.
+Training set was divided with ratio 0.1 (for testset) so that the number of examples of each class is equal in both training and test set.
+IAs a result we got 300 examples for test set and 2700 raw examples for training set.
+Additionally, training set was specially manipulated in order to multiply it. Every image was randomly rotated, flopped or cropped. 
+This gave us a new training set in total number of HOW_MUCH pictures.
 
-TODO: more
+TODO: more ?
 
 \section{HOG features}
+Before training our model, we had to extract HOG (eng. Histogram of oriented gradients) features from out training data set. 
+Input image \ref{fig:hog1} we used was in grayscale (?) size WIDTH? pixels to HEIGHT? pixels. As output we gained SIZE? feature size vector. 
+Example of this vector is visualized as a WIDTH? to HEIGHT? image on \ref{fig:hog2}.
+
+
 TODO: mention used parameters, show visualization on an example
 
 
