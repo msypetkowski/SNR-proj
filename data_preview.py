@@ -7,11 +7,12 @@ from itertools import starmap
 from pathlib import Path
 
 import cv2
+
 from data import *
-from visualization import merge_images_with_border, show_image, make_border
-from utils import group
-from train import config
 from eval import predict_classes
+from train import config
+from utils import group
+from visualization import merge_images_with_border, show_image, make_border
 
 
 def parse_arguments():

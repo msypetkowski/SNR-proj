@@ -50,7 +50,7 @@ def transform_img(img, rand):
     :param img: image to be transformed
     :param rand: random generator
     """
-    if (rand.random() < 0.5):
+    if rand.random() < 0.5:
         img = flip_img(img, 1)
     r = [rand.random() for _ in range(4)]
     # TODO: consider doing sometching to avoid cutting bird's head

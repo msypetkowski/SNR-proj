@@ -3,6 +3,7 @@ import glob
 from pathlib import Path
 
 import tensorflow as tf
+
 import data
 from train import Model, config
 
@@ -27,8 +28,6 @@ def list_model_checkpoints(model_name, model_dir):
 
 
 def predict_classes(args, images_features):
-    model_dir = str(args.model_dir.joinpath(args.model_name))
-
     with tf.Session() as sess:
         img_features = tf.placeholder(tf.float32, (None,) + config.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + config.model_labels_shape, name='ImgLabels')
