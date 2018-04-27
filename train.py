@@ -29,6 +29,9 @@ class Config(BaseConfig):
     weights_init_stddev =  0.02
     enable_batchnorm = True
 
+    activation_fun = tf.nn.relu
+    # activation_fun = tf.sigmoid
+
 
 config = Config
 
@@ -88,7 +91,7 @@ class Model:
         self._summaries = tf.summary.merge(self._summaries)
         self._valid_summaries = tf.summary.merge(self._valid_summaries)
 
-    def _layer_wrapper(self, layer, activation=tf.nn.relu):
+    def _layer_wrapper(self, layer, activation=config.activation_fun):
         if config.enable_batchnorm:
             layer = tf.layers.batch_normalization(layer, training=self._is_training)
         return activation(layer)
