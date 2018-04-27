@@ -141,7 +141,7 @@ def get_hog_features(img, feat_size=config.hog_feature_size):
         return fd
 
 
-def process_one_example(name, img, cls, bbox, rand=random.Random(), use_hog=True, augment=True):
+def process_one_example(name, img, cls, bbox, rand, use_hog=True, augment=True):
     """ Returns feed-ready pair (img_feature_vec, cls_vec).
     """
     if augment:
@@ -154,7 +154,7 @@ def process_one_example(name, img, cls, bbox, rand=random.Random(), use_hog=True
     return (get_hog_features(img) if use_hog else cv2.resize(img, tuple([config.feed_ready_image_size] * 2))), label
 
 
-def example_generator(raw_data, random_seed=123, use_hog=True, augment=True):
+def example_generator(raw_data, random_seed=config.random_seed, use_hog=True, augment=True):
     """ Yields feed-ready examples infinitely - pairs (img_feature_vec, cls_vec)
     Does data augmentation.
     """
@@ -162,14 +162,14 @@ def example_generator(raw_data, random_seed=123, use_hog=True, augment=True):
     while True:
         rand.shuffle(raw_data)
         for ex in raw_data:
-            yield process_one_example(*ex, use_hog=use_hog, augment=augment)
+            yield process_one_example(*ex, use_hog=use_hog, rand=rand, augment=augment)
 
 
 def get_train_validation_raw(validation_ratio):
     """ Returns pair (train_raw_data, validation_raw_data)
     """
     raw_data = read_raw()
-    rand = random.Random(123)
+    rand = random.Random(config.random_seed)
     rand.shuffle(raw_data)
     raw_data.sort(key=lambda x: x[2])
     by_class = [list(g) for _, g in groupby(raw_data, lambda x: x[2])]
@@ -198,5 +198,5 @@ def get_unaugmented(raw_data, use_hog=True):
     for filename, img, cls, bbox in raw_data:
         cropped_img, new_bbox = crop_image(img, bbox, bbox)
         ret.append((process_one_example(
-            filename, cropped_img, cls, new_bbox, use_hog=use_hog, augment=False)))
+            filename, cropped_img, cls, new_bbox, use_hog=use_hog, augment=False, rand=None)))
     return list(zip(*ret))

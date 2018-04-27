@@ -67,9 +67,11 @@ def view_test(args):
         if not args.model_dir or not args.model_name:
             raise ValueError("Reguired model-dir and model-name for testset evaluation.")
         features = [get_hog_features(img) for img in images]
-        prediction = predict_classes(args, features)
+        prediction = predict_classes(args, features, labels)
         is_correct = [np.argmax(lbl) == np.argmax(pred) for lbl, pred in zip(labels, prediction)]
         assert len(is_correct) == len(images)
+        print('good answers:', sum(is_correct))
+        print('accuracy:', sum(is_correct)/len(is_correct))
         images = [make_border(img, color=(int(cor) * 255, 0, int(not cor) * 255))
                     for img, cor in zip(images, is_correct)]
         show_image(merge_images(images, scale=0.5))

@@ -27,7 +27,7 @@ def list_model_checkpoints(model_name, model_dir):
     return checkpoints
 
 
-def predict_classes(args, images_features):
+def predict_classes(args, images_features, lbl=None):
     with tf.Session() as sess:
         img_features = tf.placeholder(tf.float32, (None,) + config.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + config.model_labels_shape, name='ImgLabels')
@@ -39,10 +39,13 @@ def predict_classes(args, images_features):
         print('using checkpoint:', chkp)
         saver.restore(sess, chkp)
 
+        if lbl is not None:
+            print('accuracy:', sess.run(model.accuracy_op(), {
+                img_features: images_features,
+                labels: lbl
+            })[0])
         return sess.run(model.eval_op(), {
             img_features: images_features,
-            # labels: lbl,
-            # learning_rate: lr,
         })[0]
 
 

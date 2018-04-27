@@ -23,7 +23,9 @@ class Config(BaseConfig):
     validation_raw_examples_ratio = 0.1
 
     # model config
-    hidden_size = [256, 196, 128, 64]
+    # hidden_size = [256, 196, 196, 128, 64]
+    # hidden_size = [256, 196, 128, 64]
+    hidden_size = [256, 128, 64]
     weights_init_stddev =  0.02
     enable_batchnorm = True
 
@@ -66,8 +68,8 @@ class Model:
         with tf.name_scope('AccuracyStat'):
             is_correct = tf.equal(tf.argmax(self._prediction, 1),
                                   tf.argmax(labels, 1))
-            accuracy = tf.reduce_mean(tf.cast(is_correct, tf.float32))
-            self._summaries.append(tf.summary.scalar('Accuracy', accuracy))
+            self._accuracy = tf.reduce_mean(tf.cast(is_correct, tf.float32))
+            self._summaries.append(tf.summary.scalar('Accuracy', self._accuracy))
             self._valid_summaries.append(self._summaries[-1])
 
         self._summaries.append(tf.summary.scalar('LearningRate', learning_rate))
@@ -108,6 +110,9 @@ class Model:
     def eval_op(self):
         return [self._prediction]
 
+    def accuracy_op(self):
+        return [self._accuracy]
+
 
 def main(args):
     with tf.Session() as sess:
@@ -146,7 +151,6 @@ def main(args):
         i = 0
         try:
             for i in range(100000):
-                print('step', i)
                 lr *= config.lr_decay
 
                 # generate next batch
@@ -167,11 +171,11 @@ def main(args):
                     saver.save(sess, model_dir, global_step=i)
 
                 if i % validation_ratio == 0:
+                    print('step', i)
                     img, lbl = validation_set
                     summaries = sess.run(model.valid_op(), {
                         img_features: img,
                         labels: lbl,
-                        learning_rate: lr,
                         is_training: False,
                     })[0]
                     validation_writer.add_summary(summaries, i)
@@ -180,7 +184,26 @@ def main(args):
 
 
         except KeyboardInterrupt:
-            saver.save(sess, model_dir, global_step=i)
+            pass
+
+        saver.save(sess, model_dir, global_step=i)
+
+        # last validation
+        img, lbl = validation_set
+        summaries = sess.run(model.valid_op(), {
+            img_features: img,
+            labels: lbl,
+            is_training: False,
+        })[0]
+        validation_writer.add_summary(summaries, i)
+        writer.flush()
+        validation_writer.flush()
+
+        print('final accuracy:', sess.run(model.accuracy_op(), {
+            img_features: img,
+            labels: lbl,
+            is_training: False,
+        })[0])
 
         t = time.time() - start_time
         print('global training time:', str(t) + "s")
