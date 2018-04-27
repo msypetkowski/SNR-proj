@@ -44,7 +44,7 @@ Additionally, training set is augmented during training (see section \ref{augmen
 \subsection{Data augmentation}
 \label{augmentation}
 Every training image is randomly rotated, flopped or cropped. 
-Augmented examples for example shown on figure \ref{fig:aug1}
+Augmented examples (unaugmented version is shown on figure \ref{fig:aug1})
 are shown on figure \ref{fig:aug2}.
 
 \begin{figure}[h]
@@ -70,7 +70,9 @@ We directly feed these vectors into our network.
 
 \subsection{Model architecture}
 We selected the architecture by experimenting.
-Our network has 3 dense hidden dense layers of sizes 256, 128 and 64
+Our network has 3 hidden dense layers of sizes 256, 128 and 64
+Larger models tended overfit since we have small dataset
+(despite of augmentation).
 Each of these layers have corresponding batch normalization layer.
 After the last layer there is a softmax function.
 We use cross enthropy as a loss function.
@@ -88,10 +90,10 @@ Visualization of the model is shown on figure \ref{fig:arch}.
     \label{fig:arch}
 \end{figure}
 
-\subsection{Results}
+\subsection{Training and results}
 Accuracy and loss curves on training and validation set are shown on figure \ref{fig:training}.
 Full results on testset for the model using relu are shown on figure \ref{fig:eval}.
-Final accuracy of relu model is TODO and for sigmoid -- Y TODO.
+Final accuracy of relu model is around 24\%.
 
 \begin{figure}[h]
     \caption[]{Results on testset (blue - good answers)}
@@ -100,12 +102,12 @@ Final accuracy of relu model is TODO and for sigmoid -- Y TODO.
     \label{fig:eval}
 \end{figure}
 
-% \begin{figure}[h]
-%     \caption[]{Accuracy and loss curves}
-%     \centering
-%     \includegraphics[page=2,width=1.0\textwidth]{training.png}
-%     \label{fig:training}
-% \end{figure}
+\begin{figure}[h]
+    \caption[]{Accuracy and loss curves}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{training.png}
+    \label{fig:training}
+\end{figure}
 
 \section{Convolutional neural networks}
 Not done yet.
