@@ -35,17 +35,22 @@ The data set consist of 50 subsets -- types of bird species.
 Each subset is a set of 60 different pictures.
 Altogether it gives us a data set of 3000 pictures.
 
-We divided this dataset with ratio 0.1 (for testset)
-so that the number of examples of each class is equal in both training and test set.
-As a result we got 300 examples for test set and 2700 raw examples for training set.
+We divided this dataset, so that there are 300 examples in test set and
+2700 examples in training set.
+Number of examples per each class is equal in both training and test set
+(54 examples per class in training set and 6 in test set).
 Additionally, training set is augmented during training (see section \ref{augmentation}).
 
 
 \subsection{Data augmentation}
 \label{augmentation}
-Every training image is randomly rotated, flopped or cropped. 
-Augmented examples (unaugmented version is shown on figure \ref{fig:aug1})
-are shown on figure \ref{fig:aug2}.
+Every training image is randomly rotated, flipped or cropped.
+Augmentation is done online, so the number of training examples is
+practically infinite.
+We skip the distributions of the transformations in this document.
+Instead we attach an example visualization.
+Raw -- unaugmented example is shown on on figure \ref{fig:aug1}.
+Corresponding augmented examples are shown on figure \ref{fig:aug2}.
 
 \begin{figure}[h]
     \caption[]{Not augmented example}
@@ -55,7 +60,7 @@ are shown on figure \ref{fig:aug2}.
 \end{figure}
 
 \begin{figure}[h]
-    \caption[]{Augmented examples}
+    \caption[]{Augmented examples corresponding to raw example on figure \ref{fig:aug1}}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{aug2.png}
     \label{fig:aug2}
@@ -63,14 +68,24 @@ are shown on figure \ref{fig:aug2}.
 
 
 \subsection{HOG features}
-We resize each image to 128x64x3 and we use
-standard HOG features calculation procedure
-(vectors of length 3780 are produced in this process).
-We directly feed these vectors into our network.
+To get HOG features, we first resize an image to 128x64x3.
+Then we calculate the features using OpenCV library:
+\begin{verbatim}
+    hog = cv2.HOGDescriptor()
+    fd = hog.compute(img).flatten()
+\end{verbatim}
+Image is first divided into 8x8 cells (in result, we get 16 * 8 cells).
+We use gradient orientation bins of size 9.
+Then the algorithm takes 16x16 blocks (4 cells) --
+there are 7 * 15 such blocks.
+Histograms of each of 4 cells in block are concatenated an L2 normalized.
+In the end all blocks histograms are concatenated giving
+final feature vecor of length (7 * 15) * 36 = 3780.
+We directly feed such vectors into our network.
 
 \subsection{Model architecture}
 We selected the architecture by experimenting.
-Our network has 3 hidden dense layers of sizes 256, 128 and 64
+Our network has 3 hidden dense layers of sizes 256, 128 and 64.
 Larger models tended overfit since we have small dataset
 (despite of augmentation).
 Each of these layers have corresponding batch normalization layer.
@@ -83,6 +98,7 @@ We tested 2 models with different activation functions:
 \end{itemize}
 Visualization of the model is shown on figure \ref{fig:arch}.
 
+% TODO: draw different - more simple schema instead of tensorboard printscreen
 \begin{figure}[h]
     \caption[]{Tensorboard visualization of multilayer perceptron architecture (relu activation variant)}
     \centering
@@ -102,6 +118,7 @@ Final accuracy of relu model is around 24\%.
     \label{fig:eval}
 \end{figure}
 
+% TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
 \begin{figure}[h]
     \caption[]{Accuracy and loss curves}
     \centering
