@@ -11,7 +11,8 @@
 \begin{document}
 
 
-\title{SNR classes project - birds species recognition using deep neural networks}
+\title{SNR classes project - birds species recognition using deep neural networks
+- first stage report}
 
 \author{Michał Sypetkowski, Marcin Lew, Filip Smurawa}
 \maketitle
@@ -31,7 +32,7 @@ The project is tested to run in Linux environment.
 \section{Multilayer Perceptron}
 
 \subsection{Data}
-The data set consist of 50 subsets -- types of bird species.
+Dataset consist of 50 subsets -- types of bird species.
 Each subset is a set of 60 different pictures.
 Altogether it gives us a data set of 3000 pictures.
 
@@ -86,11 +87,11 @@ We directly feed such vectors into our network.
 \subsection{Model architecture}
 We selected the architecture by experimenting.
 Our network has 3 hidden dense layers of sizes 256, 128 and 64.
-Larger models tended overfit since we have small dataset
+Since we have small dataset, larger models tended overfitting
 (despite of augmentation).
 Each of these layers have corresponding batch normalization layer.
 After the last layer there is a softmax function.
-We use cross enthropy as a loss function.
+We use cross entropy as a loss function.
 We tested 2 models with different activation functions:
 \begin{itemize}
     \item relu
@@ -111,6 +112,14 @@ Accuracy and loss curves on training and validation set are shown on figure \ref
 Full results on testset for the model using relu are shown on figure \ref{fig:eval}.
 Final accuracy of relu model is around 24\%.
 
+% TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
+\begin{figure}[H]
+    \caption[]{Accuracy and loss curves}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{training.png}
+    \label{fig:training}
+\end{figure}
+
 \begin{figure}[h]
     \caption[]{Results on testset (blue - good answers)}
     \centering
@@ -118,19 +127,14 @@ Final accuracy of relu model is around 24\%.
     \label{fig:eval}
 \end{figure}
 
-% TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
-\begin{figure}[h]
-    \caption[]{Accuracy and loss curves}
-    \centering
-    \includegraphics[page=2,width=1.0\textwidth]{training.png}
-    \label{fig:training}
-\end{figure}
-
 \section{Convolutional neural networks}
-Not done yet.
+We are planning to use {ResNet}\footnote{\url{https://arxiv.org/abs/1512.03385}}
+as a baseline model.
 
-\section{SVM}
-Not done yet.
+Since we have small dataset, we are not sure if a very deep architecture
+will be efficient in our case.
+Eventually, we will consider architectures designed
+for more shallow models (e.g. VGG \footnote{\url{https://arxiv.org/abs/1409.1556}}).
 
 
 
