@@ -4,7 +4,7 @@ Utilities for reading and preparing data.
 import random
 from itertools import islice, groupby, starmap
 
-from config import config
+from config import BaseConfig as config
 from img_process import transform_img
 from utils import transposed_group
 # from skimage.feature import hog

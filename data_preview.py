@@ -62,7 +62,7 @@ def view_test(args):
     _, conf = get_model_and_config(args)
     _, raw_test_data = get_train_validation_raw(conf.validation_raw_examples_ratio)
     images, _ = get_unaugmented(raw_test_data, use_hog=args.view_hog)
-    features, labels = get_unaugmented(raw_test_data, use_hog=True)
+    features, labels = get_unaugmented(raw_test_data, use_hog=conf.use_hog)
     if args.eval:
         if not args.model_dir or not args.model_name:
             raise ValueError("Reguired model-dir and model-name for testset evaluation.")

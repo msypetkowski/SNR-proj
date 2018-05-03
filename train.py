@@ -7,6 +7,7 @@ import tensorflow as tf
 import config
 import data
 import perceptron
+import my_conv
 
 
 def parse_arguments():
@@ -15,7 +16,7 @@ def parse_arguments():
                         dest='model_dir', type=Path, required=True)
     parser.add_argument('-n', '--model-name', help='Model name',
                         dest='model_name', type=str, required=True)
-    parser.add_argument('-t', '--model-type', help='Model type (currently only perceptron is supported)',
+    parser.add_argument('-t', '--model-type', help='Model type (currently perceptron and my_conv are supported)',
                         dest='model_type', type=str, default='perceptron')
     return parser.parse_args()
 
@@ -24,9 +25,24 @@ def get_model_and_config(args):
     if args.model_type == 'perceptron':
         conf = config.PerceptronConfig
         Model = perceptron.PerceptronModel
+    elif args.model_type == 'my_conv':
+        conf = config.MyConvConfig
+        Model = my_conv.MyConvModel
     else:
-        raise ValueError("Model type not supported")
+        raise ValueError("Model type {} not supported".format(args.model_type))
     return Model, conf
+
+
+def print_parameters_stat():
+    total_parameters = 0
+    for variable in tf.trainable_variables():
+        # shape is an array of tf.Dimension
+        shape = variable.get_shape()
+        variable_parameters = 1
+        for dim in shape:
+            variable_parameters *= dim.value
+        total_parameters += variable_parameters
+    print('Total trainable parameters: ', total_parameters)
 
 
 def main(args):
@@ -48,10 +64,12 @@ def main(args):
         validation_writer = tf.summary.FileWriter(validation_dir)
         saver = tf.train.Saver()
 
+        print_parameters_stat()
+
         # setup input data
         train_data, test_data = data.get_train_validation_raw(conf.validation_raw_examples_ratio)
-        batch_generator = iter(data.batch_generator(train_data, conf.batch_size))
-        validation_set = data.get_unaugmented(test_data)
+        batch_generator = iter(data.batch_generator(train_data, conf.batch_size, use_hog=conf.use_hog))
+        validation_set = data.get_unaugmented(test_data, use_hog=conf.use_hog)
 
         # measure time
         start_time = time.time()

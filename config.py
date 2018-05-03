@@ -26,6 +26,7 @@ class PerceptronConfig(BaseConfig):
     model_img_features_shape = (BaseConfig.hog_feature_size,)
     model_labels_shape = (BaseConfig.classes_count,)
     model_output_shape = model_labels_shape
+    use_hog = True
 
     # training config
     batch_size = 128
@@ -47,4 +48,17 @@ class PerceptronConfig(BaseConfig):
     # activation_fun = tf.sigmoid
 
 
-config = BaseConfig
+class MyConvConfig(PerceptronConfig):
+    model_img_features_shape = (*[BaseConfig.feed_ready_image_size]*2, 3)
+    use_hog = False
+    hidden_size = [
+        # filter size   strides     output depth
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (1, 1),     64),
+        ((5, 5),        (1, 1),     64),
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (1, 1),     128),
+        ((5, 5),        (1, 1),     128),
+        ((5, 5),        (2, 2),     256), # 8x8
+    ]
