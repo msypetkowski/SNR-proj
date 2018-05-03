@@ -1,21 +1,8 @@
-import argparse
 import glob
-from pathlib import Path
 
 import tensorflow as tf
 
-import data
-from train import Model, config
-
-
-def parse_arguments():
-    parser = argparse.ArgumentParser(description='Multilayer perceptron evaluation on given images.')
-    parser.add_argument('-m', '--model-dir', help='Model dir',
-                        dest='model_dir', type=Path, required=True)
-    parser.add_argument('-n', '--model-name', help='Model name',
-                        dest='model_name', type=str, required=True)
-    # TODO: images parameter
-    return parser.parse_args()
+from train import get_model_and_config, parse_arguments
 
 
 def list_model_checkpoints(model_name, model_dir):
@@ -28,10 +15,11 @@ def list_model_checkpoints(model_name, model_dir):
 
 
 def predict_classes(args, images_features, lbl=None):
+    Model, conf = get_model_and_config(args)
     with tf.Session() as sess:
-        img_features = tf.placeholder(tf.float32, (None,) + config.model_img_features_shape, name='ImgFeatures')
-        labels = tf.placeholder(tf.float32, (None,) + config.model_labels_shape, name='ImgLabels')
-        model = Model(img_features, labels, 0, is_training=False)
+        img_features = tf.placeholder(tf.float32, (None,) + conf.model_img_features_shape, name='ImgFeatures')
+        labels = tf.placeholder(tf.float32, (None,) + conf.model_labels_shape, name='ImgLabels')
+        model = Model(img_features, labels, 0, is_training=False, config=conf)
 
         saver = tf.train.Saver()
         checkpoints = list_model_checkpoints(args.model_name, args.model_dir)
@@ -49,7 +37,7 @@ def predict_classes(args, images_features, lbl=None):
         })[0]
 
 
-def main(args):
+def main(_):
     raise NotImplementedError
 
 

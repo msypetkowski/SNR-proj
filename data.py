@@ -2,10 +2,7 @@
 Utilities for reading and preparing data.
 """
 import random
-from itertools import islice, groupby, chain, repeat, starmap
-
-import cv2
-import numpy as np
+from itertools import islice, groupby, starmap
 
 from config import config
 from img_process import transform_img
@@ -72,7 +69,7 @@ def preprocess_raw_image(img, bbox, extend_ratio=0.6):
     dx, dy = [round(i * extend_ratio) for i in (w, h)]
     x, y = x - dx, y - dy
     w, h = w + dx * 2, h + dy * 2
-    img, bbox = crop_image(img, (x,y,w,h), bbox)
+    img, bbox = crop_image(img, (x, y, w, h), bbox)
     img, bbox = scale_image(img, config.raw_image_size, bbox)
     return img, bbox
 
@@ -96,9 +93,9 @@ def read_raw(count=-1):
     # nor are proper for the preprocessedd images
     ret = [(p.name, cv2.imread(str(p)), classes[p.name], bboxes[p.name])
            for p in islice(config.images_paths, count)]
-    ret = [[(name, new_img , cls, new_bbox)  # where:
+    ret = [[(name, new_img, cls, new_bbox)  # where:
             for new_img, new_bbox in (preprocess_raw_image(img, bbox),)][0]
-                for name, img, cls, bbox in ret]
+           for name, img, cls, bbox in ret]
     return map_classes(ret)
 
 
@@ -128,7 +125,7 @@ def get_hog_features(img, feat_size=config.hog_feature_size):
     hog = cv2.HOGDescriptor()
     fd = hog.compute(img)
     fd = fd.flatten()
-    assert fd.shape == (config.hog_feature_size, )
+    assert fd.shape == (config.hog_feature_size,)
 
     if len(fd) != feat_size:
         # TODO: find a good way for adjusting feature size
@@ -141,7 +138,7 @@ def get_hog_features(img, feat_size=config.hog_feature_size):
         return fd
 
 
-def process_one_example(name, img, cls, bbox, rand, use_hog=True, augment=True):
+def process_one_example(_name, img, cls, _bbox, rand, use_hog=True, augment=True):
     """ Returns feed-ready pair (img_feature_vec, cls_vec).
     """
     if augment:
