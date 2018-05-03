@@ -6,8 +6,7 @@ import tensorflow as tf
 
 import config
 import data
-import perceptron
-import my_conv
+from models import my_conv, perceptron
 
 
 def parse_arguments():

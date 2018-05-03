@@ -1,5 +1,7 @@
 import tensorflow as tf
-from perceptron import PerceptronModel
+
+from models.perceptron import PerceptronModel
+
 
 class MyConvModel(PerceptronModel):
 
