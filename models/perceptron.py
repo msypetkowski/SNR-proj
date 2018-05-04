@@ -1,8 +1,11 @@
 import tensorflow as tf
+from .base_model import BaseModel
 
 
-class PerceptronModel:
+class PerceptronModel(BaseModel):
     def __init__(self, img_features, labels, learning_rate, is_training, config):
+        self._images = img_features
+        self._labels = labels
         self._is_training = is_training
         self._config = config
 
@@ -49,8 +52,6 @@ class PerceptronModel:
 
         self._init = tf.global_variables_initializer()
 
-        tf.get_default_graph().finalize()
-
     def _layer_wrapper(self, layer, activation):
         if self._config.enable_batchnorm:
             layer = tf.layers.batch_normalization(layer, training=self._is_training)
@@ -68,14 +69,8 @@ class PerceptronModel:
     def train_op(self):
         return [self._summaries, self._train_op]
 
-    def valid_op(self):
-        return [self._valid_summaries]
-
-    def eval_op(self):
-        return [self._prediction]
-
-    def accuracy_op(self):
-        return [self._accuracy]
+    def valid_fun(self, sess, images, labels):
+        return sess.run(self._valid_summaries, self._get_feed_dict(images, labels))
 
     def init_fun(self, sess):
         sess.run(self._init)

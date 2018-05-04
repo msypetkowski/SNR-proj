@@ -24,12 +24,16 @@ class BaseConfig:
     # feed_ready_image_size = 128  # for convolution and visualization
     feed_ready_image_size = 224
 
+    model_dir = Path.home().joinpath('snrmodels')
+
+
 class BaseTrainingLoopConfig(BaseConfig):
     save_train_summaries_ratio = 5
     save_validation_summaries_ratio = 20
     validation_raw_examples_ratio = 0.1
     max_training_steps = 20000
-    save_weights_ratio = 500
+    save_weights_ratio = 1000
+
 
 class PerceptronConfig(BaseTrainingLoopConfig):
     model_img_features_shape = (BaseConfig.hog_feature_size,)

@@ -11,8 +11,6 @@ import models
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Multilayer perceptron training for birds recogntion.')
-    parser.add_argument('-m', '--model-dir', help='Model dir',
-                        dest='model_dir', type=Path, required=True)
     parser.add_argument('-n', '--model-name', help='Model name',
                         dest='model_name', type=str, required=True)
     parser.add_argument('-t', '--model-type', help='Model type (perceptron, my_conv or vgg16_pretrained)',
@@ -63,10 +61,10 @@ def main(args):
         model.init_fun(sess)
 
         # setup saving summaries and checkpoints
-        model_dir = str(args.model_dir.joinpath(args.model_name))
+        model_dir = str(conf.model_dir.joinpath(args.model_name))
         writer = tf.summary.FileWriter(model_dir)
         writer.add_graph(sess.graph)
-        validation_dir = str(args.model_dir.joinpath(args.model_name + '_validation'))
+        validation_dir = str(conf.model_dir.joinpath(args.model_name + '_validation'))
         validation_writer = tf.summary.FileWriter(validation_dir)
         saver = tf.train.Saver()
 
@@ -112,13 +110,7 @@ def main(args):
                 if i % conf.save_validation_summaries_ratio == 0:
                     print('step', i)
                     img, lbl = validation_set
-                    img = img[:64] # TODO: remove
-                    lbl = lbl[:64] # TODO: remove
-                    summaries = sess.run(model.valid_op(), {
-                        img_features: img,
-                        labels: lbl,
-                        is_training: False,
-                    })[0]
+                    summaries = model.valid_fun(sess, img, lbl)
                     validation_writer.add_summary(summaries, i)
                     writer.flush()
                     validation_writer.flush()
@@ -130,20 +122,12 @@ def main(args):
 
         # last validation
         img, lbl = validation_set
-        summaries = sess.run(model.valid_op(), {
-            img_features: img,
-            labels: lbl,
-            is_training: False,
-        })[0]
+        summaries = model.valid_fun(sess, img, lbl)
         validation_writer.add_summary(summaries, i)
         writer.flush()
         validation_writer.flush()
 
-        print('final accuracy:', sess.run(model.accuracy_op(), {
-            img_features: img,
-            labels: lbl,
-            is_training: False,
-        })[0])
+        print('final accuracy:', model.accuracy_fun(sess, img, lbl))
 
         t = time.time() - start_time
         print('global training time:', str(t) + "s")

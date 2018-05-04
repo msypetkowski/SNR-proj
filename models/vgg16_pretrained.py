@@ -1,15 +1,25 @@
 """ Ripped from: https://gist.github.com/omoindrot/dedc857cdc0e680dfb1be99762990c9c/
+VGG16 model pretrained on ImageNet
+
+wget http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz
+tar -xvf vgg_16_2016_08_28.tar.gz
+
 """
 from pathlib import Path
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
 import tensorflow.contrib.slim.nets
+from .base_model import BaseModel
 
 
-class VGG16PretrainedModel():
+class VGG16PretrainedModel(BaseModel):
     def __init__(self, images, labels, is_training, config):
+        self._images = images
+        self._labels = labels
+        self._is_training = is_training
+        self._config = config
         self._summaries = []
-        self._valid_summaries = []
+        # self._valid_summaries = []
 
         vgg = tf.contrib.slim.nets.vgg
         with slim.arg_scope(vgg.vgg_arg_scope(weight_decay=config.weight_decay)):
@@ -61,11 +71,11 @@ class VGG16PretrainedModel():
         self._accuracy=accuracy
 
         self._summaries.append(tf.summary.scalar('Accuracy', accuracy))
-        self._valid_summaries.append(self._summaries[-1])
+        # self._valid_summaries.append(self._summaries[-1])
         self._summaries.append(tf.summary.scalar('Loss', loss))
-        self._valid_summaries.append(self._summaries[-1])
+        # self._valid_summaries.append(self._summaries[-1])
         self._summaries = tf.summary.merge(self._summaries)
-        self._valid_summaries = tf.summary.merge(self._valid_summaries)
+        # self._valid_summaries = tf.summary.merge(self._valid_summaries)
 
         # tf.get_default_graph().finalize()
 
@@ -76,14 +86,11 @@ class VGG16PretrainedModel():
     def full_train_op(self):
         return [self._summaries, self._full_train_op]
 
-    def valid_op(self):
-        return [self._valid_summaries]
-
-    def eval_op(self):
-        return [self._prediction]
-
-    def accuracy_op(self):
-        return [self._accuracy]
+    def valid_fun(self, sess, images, labels):
+        accuracy = self.accuracy_fun(sess, images, labels)
+        summary = tf.Summary()
+        summary.value.add(tag="Accuracy", simple_value=accuracy)
+        return summary
 
     def init_fun(self, sess):
         self._init_fn(sess)
