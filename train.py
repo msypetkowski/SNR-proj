@@ -6,7 +6,7 @@ import tensorflow as tf
 
 import config
 import data
-from models import my_conv, perceptron
+import models
 
 
 def parse_arguments():
@@ -15,7 +15,7 @@ def parse_arguments():
                         dest='model_dir', type=Path, required=True)
     parser.add_argument('-n', '--model-name', help='Model name',
                         dest='model_name', type=str, required=True)
-    parser.add_argument('-t', '--model-type', help='Model type (currently perceptron and my_conv are supported)',
+    parser.add_argument('-t', '--model-type', help='Model type (perceptron, my_conv or vgg16_pretrained)',
                         dest='model_type', type=str, default='perceptron')
     return parser.parse_args()
 
@@ -23,10 +23,13 @@ def parse_arguments():
 def get_model_and_config(args):
     if args.model_type == 'perceptron':
         conf = config.PerceptronConfig
-        Model = perceptron.PerceptronModel
+        Model = models.perceptron.PerceptronModel
     elif args.model_type == 'my_conv':
         conf = config.MyConvConfig
-        Model = my_conv.MyConvModel
+        Model = models.my_conv.MyConvModel
+    elif args.model_type == 'vgg16_pretrained':
+        conf = config.VGG16PretrainedConfig
+        Model = models.vgg16_pretrained.VGG16PretrainedModel
     else:
         raise ValueError("Model type {} not supported".format(args.model_type))
     return Model, conf
@@ -49,11 +52,15 @@ def main(args):
     with tf.Session() as sess:
         img_features = tf.placeholder(tf.float32, (None,) + conf.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + conf.model_labels_shape, name='ImgLabels')
-        learning_rate = tf.placeholder(tf.float32, name='LearningRate')
+        if Model.feed_lr():
+            learning_rate = tf.placeholder(tf.float32, name='LearningRate')
         is_training = tf.placeholder(tf.bool, shape=(), name='IsTraining')
 
-        model = Model(img_features, labels, learning_rate, is_training=is_training, config=conf)
-        sess.run(tf.global_variables_initializer())
+        if Model.feed_lr():
+            model = Model(img_features, labels, learning_rate, is_training=is_training, config=conf)
+        else:
+            model = Model(img_features, labels, is_training=is_training, config=conf)
+        model.init_fun(sess)
 
         # setup saving summaries and checkpoints
         model_dir = str(args.model_dir.joinpath(args.model_name))
@@ -75,23 +82,27 @@ def main(args):
         data_generation_time_sum = 0
 
         # training loop
-        lr = conf.initial_lr
+        if model.feed_lr():
+            lr = conf.initial_lr
         i = 0
         try:
             for i in range(conf.max_training_steps):
-                lr *= conf.lr_decay
+                if model.feed_lr():
+                    lr *= conf.lr_decay
 
                 # generate next batch
                 start_generation_time = time.time()
                 img, lbl = next(batch_generator)
                 data_generation_time_sum += time.time() - start_generation_time
 
-                summaries = sess.run(model.train_op(), {
+                feed_dict = {
                     img_features: img,
                     labels: lbl,
-                    learning_rate: lr,
                     is_training: True,
-                })[0]
+                }
+                if model.feed_lr():
+                    feed_dict[learning_rate] = lr
+                summaries = sess.run(model.train_op(), feed_dict)[0]
 
                 if i % conf.save_train_summaries_ratio == 0:
                     writer.add_summary(summaries, i)
@@ -101,6 +112,8 @@ def main(args):
                 if i % conf.save_validation_summaries_ratio == 0:
                     print('step', i)
                     img, lbl = validation_set
+                    img = img[:64] # TODO: remove
+                    lbl = lbl[:64] # TODO: remove
                     summaries = sess.run(model.valid_op(), {
                         img_features: img,
                         labels: lbl,

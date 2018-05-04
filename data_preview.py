@@ -63,9 +63,15 @@ def view_test(args):
     _, raw_test_data = get_train_validation_raw(conf.validation_raw_examples_ratio)
     images, _ = get_unaugmented(raw_test_data, use_hog=args.view_hog)
     features, labels = get_unaugmented(raw_test_data, use_hog=conf.use_hog)
+
+    images = images[:64] # TODO: remove
+    features = features[:64] # TODO: remove
+    labels = labels[:64] # TODO: remove
+
     if args.eval:
         if not args.model_dir or not args.model_name:
             raise ValueError("Reguired model-dir and model-name for testset evaluation.")
+
         prediction = predict_classes(args, features, labels)
         is_correct = [np.argmax(lbl) == np.argmax(pred) for lbl, pred in zip(labels, prediction)]
         assert len(is_correct) == len(images)

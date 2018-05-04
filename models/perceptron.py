@@ -42,10 +42,14 @@ class PerceptronModel:
                 gradients, variables = zip(*optimizer.compute_gradients(
                     self._loss, var_list=tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='Model')))
                 gradients, _ = tf.clip_by_global_norm(gradients, 1.0)
-                self._optimizer = optimizer.apply_gradients(zip(gradients, variables))
+                self._train_op = optimizer.apply_gradients(zip(gradients, variables))
 
         self._summaries = tf.summary.merge(self._summaries)
         self._valid_summaries = tf.summary.merge(self._valid_summaries)
+
+        self._init = tf.global_variables_initializer()
+
+        tf.get_default_graph().finalize()
 
     def _layer_wrapper(self, layer, activation):
         if self._config.enable_batchnorm:
@@ -62,7 +66,7 @@ class PerceptronModel:
         return r, summary
 
     def train_op(self):
-        return [self._summaries, self._optimizer]
+        return [self._summaries, self._train_op]
 
     def valid_op(self):
         return [self._valid_summaries]
@@ -72,3 +76,10 @@ class PerceptronModel:
 
     def accuracy_op(self):
         return [self._accuracy]
+
+    def init_fun(self, sess):
+        sess.run(self._init)
+
+    @staticmethod
+    def feed_lr():
+        return True
