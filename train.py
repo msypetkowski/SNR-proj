@@ -7,6 +7,7 @@ import tensorflow as tf
 import config
 import data
 import models
+import matplotlib.pyplot as plt
 
 
 def parse_arguments():
@@ -75,6 +76,12 @@ def main(args):
         start_time = time.time()
         data_generation_time_sum = 0
 
+        # plot values
+        model_accuracy = []
+        model_loss = []
+        model_learning_rate = []
+        train_iteration = []
+
         # training loop
         lr = conf.initial_lr
         i = 0
@@ -114,6 +121,13 @@ def main(args):
                     writer.flush()
                     validation_writer.flush()
 
+                    model_accuracy.append(model.accuracy_fun(sess, img, lbl))
+                    model_learning_rate.append(lr)
+
+                    # TODO not a loss value
+                    model_loss.append(lr)
+                    train_iteration.append(i)
+
         except KeyboardInterrupt:
             pass
 
@@ -132,6 +146,34 @@ def main(args):
         print('global training time:', str(t) + "s")
         print('waited for batch generation:', str(data_generation_time_sum) + "s")
         print('ratio:', data_generation_time_sum / t)
+
+        plt.subplot(311)
+        plt.title('Model Accuracy')
+        plt.xlabel('Iteration')
+        plt.ylabel('Accuracy')
+        plt.grid(True)
+        plt.plot(train_iteration, model_accuracy)
+
+        plt.subplot(312)
+        plt.title('Learning Rate')
+        plt.xlabel('Iteration')
+        plt.ylabel('Learning Rate')
+        plt.grid(True)
+        plt.plot(train_iteration, model_learning_rate)
+
+        plt.subplot(313)
+        plt.title('Model Loss')
+        plt.xlabel('Iteration')
+        plt.ylabel('Loss')
+        plt.grid(True)
+        plt.plot(train_iteration, model_loss)
+
+        plt.tight_layout()
+
+        plt.show()
+
+        # TODO change file name manually
+        plt.savefig('nazwa.png')
 
 
 if __name__ == '__main__':
