@@ -1,4 +1,4 @@
-\documentclass[a4paper]{article}
+﻿\documentclass[a4paper]{article}
 
 \usepackage[a4paper,  margin=1.0in]{geometry}
 
@@ -50,8 +50,8 @@ Augmentation is done online, so the number of training examples is
 roughly infinite.
 We skip the distributions of the transformations in this document.
 Instead we attach an example visualization.
-Raw -- unaugmented example is shown on on figure \ref{fig:aug1}.
-Corresponding augmented examples are shown on figure \ref{fig:aug2}.
+Raw -- unaugmented example is shown on in figure \ref{fig:aug1}.
+Corresponding augmented examples are shown in figure \ref{fig:aug2}.
 
 \begin{figure}[h]
     \caption[]{Not augmented example}
@@ -61,7 +61,7 @@ Corresponding augmented examples are shown on figure \ref{fig:aug2}.
 \end{figure}
 
 \begin{figure}[h]
-    \caption[]{Augmented examples corresponding to raw example on figure \ref{fig:aug1}}
+    \caption[]{Augmented examples corresponding to raw example in figure \ref{fig:aug1}}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{aug2.png}
     \label{fig:aug2}
@@ -97,19 +97,19 @@ We tested 2 models with different activation functions:
     \item relu
     \item sigmoid
 \end{itemize}
-Visualization of the model is shown on figure \ref{fig:arch}.
+Visualization of the model is shown in figure \ref{fig:arch}.
 
 % TODO: draw different - more simple schema instead of tensorboard printscreen
 \begin{figure}[h]
     \caption[]{Tensorboard visualization of multilayer perceptron architecture (relu activation variant)}
     \centering
-    \includegraphics[page=2,width=1.0\textwidth]{architecture.png}
+    \includegraphics[page=2,width=1.0\textwidth]{architecture.pdf}
     \label{fig:arch}
 \end{figure}
 
 \subsection{Training and results}
-Accuracy and loss curves on training and validation set are shown on figure \ref{fig:training}.
-Full results on testset for the model using relu are shown on figure \ref{fig:eval}.
+Accuracy and loss curves on training and validation set are shown in figure \ref{fig:training}.
+Full results on testset for the model using relu are shown in figure \ref{fig:eval}.
 Final accuracy of relu model is around 24\%.
 
 % TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
