@@ -100,8 +100,8 @@ We tested 2 models with different activation functions:
 Visualization of the model is shown in figure \ref{fig:arch}.
 
 % TODO: draw different - more simple schema instead of tensorboard printscreen
-\begin{figure}[h]
-    \caption[]{Tensorboard visualization of multilayer perceptron architecture (relu activation variant)}
+\begin{figure}[H]
+    \caption[]{Visualization of multilayer perceptron architecture (relu activation variant)}
     \centering
     \includegraphics[page=1,width=1.0\textwidth]{architecture.pdf}
     \label{fig:arch}
@@ -109,8 +109,11 @@ Visualization of the model is shown in figure \ref{fig:arch}.
 
 \subsection{Training and results}
 Accuracy and loss curves on training and validation set are shown in figure \ref{fig:training}.
+Training and validation curves diverge from the begining because of small dataset (one epoch is around 20 iterations).
+Because of batch normalization, validation accuracy increases along with training accuracy (but slower).
 Full results on testset for the model using relu are shown in figure \ref{fig:eval}.
 Final accuracy of relu model is around 24\%.
+Sigmoid model achieves slightly lower accuracy around 21\% (nothing unusual here).
 
 % TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
 \begin{figure}[H]
@@ -120,21 +123,46 @@ Final accuracy of relu model is around 24\%.
     \label{fig:training}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \caption[]{Results on testset (blue - good answers)}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{eval.png}
     \label{fig:eval}
 \end{figure}
 
+\newpage
 \section{Convolutional neural networks}
-We are planning to use {ResNet}\footnote{\url{https://arxiv.org/abs/1512.03385}}
-as a baseline model.
 
-Since we have small dataset, we are not sure if a very deep architecture
-will be efficient in our case.
-Eventually, we will consider architectures designed
-for more shallow models (e.g. VGG \footnote{\url{https://arxiv.org/abs/1409.1556}}).
+\subsection{Ground truth model}
+
+We trained for 1500 iterations 8-th layer of VGG16\footnote{\url{https://arxiv.org/abs/1409.1556}}
+pretrained on ImageNet\footnote{\url{https://arxiv.org/abs/1409.0575}} dataset.
+Then we finetuned it for 1000 iterations achieving final accuracy of 67\%.
+Training and validation curves are shown in figure \ref{fig:trainingVGG}.
+Full results on testset shown in figure \ref{fig:evalVGG}.
+The ckpt file is downloaded from \url{http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz}.
+
+\begin{figure}[h]
+    \caption[]{Accuracy and loss curves of VGG16 pretrained model}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{vggTraining.png}
+    \label{fig:trainingVGG}
+\end{figure}
+
+\begin{figure}[h]
+    \caption[]{Results on testset of VGG16 finetuned model (blue - good answers)}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{evalVGG.png}
+    \label{fig:evalVGG}
+\end{figure}
+
+
+% Since we have small dataset, we are not sure if a very deep architecture
+% will be efficient in our case.
+% Eventually, we will consider architectures designed
+% for more shallow models (e.g. VGG \footnote{\url{https://arxiv.org/abs/1409.1556}}).
+% We are planning to use {ResNet}\footnote{\url{https://arxiv.org/abs/1512.03385}}
+% as a baseline model.
 
 
 
