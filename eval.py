@@ -19,10 +19,7 @@ def predict_classes(args, images_features, lbl=None):
     with tf.Session() as sess:
         img_features = tf.placeholder(tf.float32, (None,) + conf.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + conf.model_labels_shape, name='ImgLabels')
-        if Model.feed_lr():
-            model = Model(img_features, labels, 0, is_training=False, config=conf)
-        else:
-            model = Model(img_features, labels, is_training=False, config=conf)
+        model = Model(img_features, labels, 0, is_training=False, config=conf)
 
         saver = tf.train.Saver()
         checkpoints = list_model_checkpoints(args.model_name, conf.model_dir)

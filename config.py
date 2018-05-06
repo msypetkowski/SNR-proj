@@ -26,6 +26,8 @@ class BaseConfig:
 
     model_dir = Path.home().joinpath('snrmodels')
 
+    finetune_begin = float('inf')  #  no finetuning by default
+
 
 class BaseTrainingLoopConfig(BaseConfig):
     save_train_summaries_ratio = 5
@@ -71,8 +73,6 @@ class MyConvConfig(PerceptronConfig):
 
 
 class VGG16PretrainedConfig(BaseTrainingLoopConfig):
-    # feed_ready_image_size = 224
-
     model_img_features_shape = (*[224]*2, 3)
     model_labels_shape = (BaseConfig.classes_count,)
 
@@ -81,5 +81,10 @@ class VGG16PretrainedConfig(BaseTrainingLoopConfig):
     dropout_keep_prob = 0.5
     weight_decay = 5e-4
     model_path = Path('vgg_16.ckpt')
-    learning_rate1 = 1e-3
-    learning_rate2 = 1e-5
+
+    initial_lr = 5e-3
+    initil_finetune_lr = 5e-5
+    lr_decay = 0.5 ** (1 / 500)
+
+    max_training_steps = 2500
+    finetune_begin = 1500

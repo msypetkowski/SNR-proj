@@ -74,7 +74,3 @@ class PerceptronModel(BaseModel):
 
     def init_fun(self, sess):
         sess.run(self._init)
-
-    @staticmethod
-    def feed_lr():
-        return True

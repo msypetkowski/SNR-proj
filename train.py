@@ -50,14 +50,10 @@ def main(args):
     with tf.Session() as sess:
         img_features = tf.placeholder(tf.float32, (None,) + conf.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + conf.model_labels_shape, name='ImgLabels')
-        if Model.feed_lr():
-            learning_rate = tf.placeholder(tf.float32, name='LearningRate')
+        learning_rate = tf.placeholder(tf.float32, name='LearningRate')
         is_training = tf.placeholder(tf.bool, shape=(), name='IsTraining')
 
-        if Model.feed_lr():
-            model = Model(img_features, labels, learning_rate, is_training=is_training, config=conf)
-        else:
-            model = Model(img_features, labels, is_training=is_training, config=conf)
+        model = Model(img_features, labels, learning_rate, is_training=is_training, config=conf)
         model.init_fun(sess)
 
         # setup saving summaries and checkpoints
@@ -80,13 +76,11 @@ def main(args):
         data_generation_time_sum = 0
 
         # training loop
-        if model.feed_lr():
-            lr = conf.initial_lr
+        lr = conf.initial_lr
         i = 0
         try:
             for i in range(conf.max_training_steps):
-                if model.feed_lr():
-                    lr *= conf.lr_decay
+                lr *= conf.lr_decay
 
                 # generate next batch
                 start_generation_time = time.time()
@@ -98,13 +92,18 @@ def main(args):
                     labels: lbl,
                     is_training: True,
                 }
-                if model.feed_lr():
-                    feed_dict[learning_rate] = lr
-                summaries = sess.run(model.train_op(), feed_dict)[0]
+                feed_dict[learning_rate] = lr
+                if i == conf.finetune_begin:
+                    print('starting finetuning')
+                    lr = conf.initil_finetune_lr
+                if i < conf.finetune_begin:
+                    summaries = sess.run(model.train_op(), feed_dict)[0]
+                else:
+                    summaries = sess.run(model.full_train_op(), feed_dict)[0]
 
                 if i % conf.save_train_summaries_ratio == 0:
                     writer.add_summary(summaries, i)
-                if i % conf.save_weights_ratio == 0:
+                if i % conf.save_weights_ratio == 0 and i > 0:
                     saver.save(sess, model_dir, global_step=i)
 
                 if i % conf.save_validation_summaries_ratio == 0:

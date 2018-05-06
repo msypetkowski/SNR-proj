@@ -13,13 +13,14 @@ from .base_model import BaseModel
 
 
 class VGG16PretrainedModel(BaseModel):
-    def __init__(self, images, labels, is_training, config):
+    def __init__(self, images, labels, learning_rate, is_training, config):
         self._images = images
         self._labels = labels
         self._is_training = is_training
         self._config = config
         self._summaries = []
-        # self._valid_summaries = []
+
+        self._summaries.append(tf.summary.scalar('LearningRate', learning_rate))
 
         vgg = tf.contrib.slim.nets.vgg
         with slim.arg_scope(vgg.vgg_arg_scope(weight_decay=config.weight_decay)):
@@ -49,12 +50,12 @@ class VGG16PretrainedModel(BaseModel):
 
         # First we want to train only the reinitialized last layer fc8 for a few epochs.
         # We run minimize the loss only with respect to the fc8 variables (weight and bias).
-        fc8_optimizer = tf.train.GradientDescentOptimizer(config.learning_rate1)
+        fc8_optimizer = tf.train.GradientDescentOptimizer(learning_rate)
         fc8_train_op = fc8_optimizer.minimize(loss, var_list=fc8_variables)
 
         # Then we want to finetune the entire model for a few epochs.
         # We run minimize the loss only with respect to all the variables.
-        full_optimizer = tf.train.GradientDescentOptimizer(config.learning_rate2)
+        full_optimizer = tf.train.GradientDescentOptimizer(learning_rate)
         full_train_op = full_optimizer.minimize(loss)
 
         # Evaluation metrics
@@ -71,11 +72,8 @@ class VGG16PretrainedModel(BaseModel):
         self._accuracy=accuracy
 
         self._summaries.append(tf.summary.scalar('Accuracy', accuracy))
-        # self._valid_summaries.append(self._summaries[-1])
         self._summaries.append(tf.summary.scalar('Loss', loss))
-        # self._valid_summaries.append(self._summaries[-1])
         self._summaries = tf.summary.merge(self._summaries)
-        # self._valid_summaries = tf.summary.merge(self._valid_summaries)
 
         # tf.get_default_graph().finalize()
 
@@ -95,7 +93,3 @@ class VGG16PretrainedModel(BaseModel):
     def init_fun(self, sess):
         self._init_fn(sess)
         sess.run(self._fc8_init)
-
-    @staticmethod
-    def feed_lr():
-        return False
