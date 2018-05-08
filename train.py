@@ -1,5 +1,6 @@
 import argparse
 import time
+from collections import defaultdict
 from pathlib import Path
 
 import tensorflow as tf
@@ -49,18 +50,19 @@ def print_parameters_stat():
 
 
 def draw_plots(args, plot_values, plot_valid_values):
-    for i, key in enumerate(set(plot_values.keys(), plot_valid_values.keys())):
+    for i, key in enumerate(set(list(plot_values.keys()) +
+                                list(plot_valid_values.keys()))):
         plt.subplot(311 + i)
-        plt.title(k)
+        plt.title(key)
         plt.xlabel('Iteration')
-        plt.ylabel(k)
+        plt.ylabel(key)
         plt.grid(True)
 
         # TODO: add legend in case there are both train and valid sumaries for the same key
         for plt_values in (plot_values, plot_valid_values):
             if key in plt_values:
-                k, values = plt_values[key]
-                plt.plot(*zip(values))
+                values = plt_values[key]
+                plt.plot(*zip(*values))
 
     plt.tight_layout()
     plt.savefig(args.plot_name + '.png')
@@ -97,8 +99,8 @@ def main(args):
         start_time = time.time()
         data_generation_time_sum = 0
 
-        plot_values = []
-        plot_valid_values = []
+        plot_values = defaultdict(list)
+        plot_valid_values = defaultdict(list)
 
         # training loop
         lr = conf.initial_lr
@@ -146,10 +148,10 @@ def main(args):
                         # TODO: get values from summary object - like following:
                         # summary_proto = tf.Summary().FromString(summaries)
                         # for entry in summary_proto.value:
-                        #     # i teraz z entry pobież co trzeba i gdzieś zapisz
+                        #     ...
 
                         plot_valid_values['Accuracy'].append((i, model.accuracy_fun(sess, img, lbl)))
-                        plot_valid_values['LearningRate'].append((i,lr))
+                        plot_valid_values['LearningRate'].append((i, lr))
                         # plot_values['Loss'].append((i,loss))
 
 
