@@ -16,7 +16,7 @@ def parse_arguments():
                         dest='model_name', type=str, required=True)
     parser.add_argument('-t', '--model-type', help='Model type (perceptron, my_conv or vgg16_pretrained)',
                         dest='model_type', type=str, default='perceptron')
-    parser.add_argument('-p', '--plot-name', help='Save plots (accuracy, learning rate, loss) as plot_name.png',
+    parser.add_argument('-p', '--plot-name', help='Save model training and validation summaries plot as plot_name.png',
                         dest='plot_name', type=str, default=None)
     return parser.parse_args()
 
@@ -46,6 +46,25 @@ def print_parameters_stat():
             variable_parameters *= dim.value
         total_parameters += variable_parameters
     print('Total trainable parameters: ', total_parameters)
+
+
+def draw_plots(args, plot_values, plot_valid_values):
+    for i, key in enumerate(set(plot_values.keys(), plot_valid_values.keys())):
+        plt.subplot(311 + i)
+        plt.title(k)
+        plt.xlabel('Iteration')
+        plt.ylabel(k)
+        plt.grid(True)
+
+        # TODO: add legend in case there are both train and valid sumaries for the same key
+        for plt_values in (plot_values, plot_valid_values):
+            if key in plt_values:
+                k, values = plt_values[key]
+                plt.plot(*zip(values))
+
+    plt.tight_layout()
+    plt.savefig(args.plot_name + '.png')
+    plt.show()
 
 
 def main(args):
@@ -78,11 +97,8 @@ def main(args):
         start_time = time.time()
         data_generation_time_sum = 0
 
-        # plot values
-        model_accuracy = []
-        model_loss = []
-        model_learning_rate = []
-        train_iteration = []
+        plot_values = []
+        plot_valid_values = []
 
         # training loop
         lr = conf.initial_lr
@@ -112,6 +128,9 @@ def main(args):
 
                 if i % conf.save_train_summaries_ratio == 0:
                     writer.add_summary(summaries, i)
+                    if args.plot_name:
+                        # TODO: add plot_values here
+                        pass
                 if i % conf.save_weights_ratio == 0 and i > 0:
                     saver.save(sess, model_dir, global_step=i)
 
@@ -123,13 +142,16 @@ def main(args):
                     writer.flush()
                     validation_writer.flush()
 
-                if args.plot_name:
-                    model_accuracy.append(model.accuracy_fun(sess, img, lbl))
-                    model_learning_rate.append(lr)
+                    if args.plot_name:
+                        # TODO: get values from summary object - like following:
+                        # summary_proto = tf.Summary().FromString(summaries)
+                        # for entry in summary_proto.value:
+                        #     # i teraz z entry pobież co trzeba i gdzieś zapisz
 
-                    # TODO not a loss value
-                    model_loss.append(lr)
-                    train_iteration.append(i)
+                        plot_valid_values['Accuracy'].append((i, model.accuracy_fun(sess, img, lbl)))
+                        plot_valid_values['LearningRate'].append((i,lr))
+                        # plot_values['Loss'].append((i,loss))
+
 
         except KeyboardInterrupt:
             pass
@@ -152,32 +174,7 @@ def main(args):
 
         # save plots (accuracy, learning rate and model loss)
         if args.plot_name:
-            plt.subplot(311)
-            plt.title('Model Accuracy')
-            plt.xlabel('Iteration')
-            plt.ylabel('Accuracy')
-            plt.grid(True)
-            plt.plot(train_iteration, model_accuracy)
-
-            plt.subplot(312)
-            plt.title('Learning Rate')
-            plt.xlabel('Iteration')
-            plt.ylabel('Learning Rate')
-            plt.grid(True)
-            plt.plot(train_iteration, model_learning_rate)
-
-            plt.subplot(313)
-            plt.title('Model Loss')
-            plt.xlabel('Iteration')
-            plt.ylabel('Loss')
-            plt.grid(True)
-            plt.plot(train_iteration, model_loss)
-
-            plt.tight_layout()
-
-            plt.savefig(args.plot_name + '.png')
-            plt.show()
-
+            draw_plots(args, plot_values, plot_valid_values)
 
 if __name__ == '__main__':
     main(parse_arguments())
