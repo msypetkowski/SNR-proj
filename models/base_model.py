@@ -1,9 +1,9 @@
 from utils import group
 import numpy as np
 
+
 # TODO: move more methods / write abstracts here
 class BaseModel:
-
     def _get_feed_dict(self, images, labels=None, for_training=False):
         feed_dict = {
             self._images: images,
@@ -35,6 +35,6 @@ class BaseModel:
         assert len(images) == len(labels)
         for img, lbl in zip(group(images, self._config.batch_size),
                             group(labels, self._config.batch_size)):
-            correct_answers += sess.run(self.accuracy_op(),self._get_feed_dict(img, lbl)) * len(img)
+            correct_answers += sess.run(self.accuracy_op(), self._get_feed_dict(img, lbl)) * len(img)
             sum_length += len(img)
         return correct_answers / sum_length

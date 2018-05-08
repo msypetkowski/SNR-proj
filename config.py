@@ -26,7 +26,7 @@ class BaseConfig:
 
     model_dir = Path.home().joinpath('snrmodels')
 
-    finetune_begin = float('inf')  #  no finetuning by default
+    finetune_begin = float('inf')  # no finetuning by default
 
 
 class BaseTrainingLoopConfig(BaseConfig):
@@ -57,7 +57,7 @@ class PerceptronConfig(BaseTrainingLoopConfig):
 
 
 class MyConvConfig(PerceptronConfig):
-    model_img_features_shape = (*[BaseConfig.feed_ready_image_size]*2, 3)
+    model_img_features_shape = (*[BaseConfig.feed_ready_image_size] * 2, 3)
     use_hog = False
     hidden_size = [
         # filter size   strides     output depth
@@ -68,12 +68,12 @@ class MyConvConfig(PerceptronConfig):
         ((5, 5),        (2, 2),     64),
         ((5, 5),        (1, 1),     128),
         ((5, 5),        (1, 1),     128),
-        ((5, 5),        (2, 2),     256), # 8x8
+        ((5, 5),        (2, 2),     256),  # 8x8
     ]
 
 
 class VGG16PretrainedConfig(BaseTrainingLoopConfig):
-    model_img_features_shape = (*[224]*2, 3)
+    model_img_features_shape = (*[224] * 2, 3)
     model_labels_shape = (BaseConfig.classes_count,)
 
     use_hog = False

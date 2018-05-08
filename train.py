@@ -51,7 +51,7 @@ def print_parameters_stat():
 
 def draw_plots(args, plot_values, plot_valid_values):
     for i, key in enumerate(set(list(plot_values.keys()) +
-                                list(plot_valid_values.keys()))):
+                                        list(plot_valid_values.keys()))):
         plt.subplot(311 + i)
         plt.title(key)
         plt.xlabel('Iteration')
@@ -114,12 +114,7 @@ def main(args):
                 img, lbl = next(batch_generator)
                 data_generation_time_sum += time.time() - start_generation_time
 
-                feed_dict = {
-                    img_features: img,
-                    labels: lbl,
-                    is_training: True,
-                }
-                feed_dict[learning_rate] = lr
+                feed_dict = {img_features: img, labels: lbl, is_training: True, learning_rate: lr}
                 if i == conf.finetune_begin:
                     print('starting finetuning')
                     lr = conf.initil_finetune_lr
@@ -177,6 +172,7 @@ def main(args):
         # save plots (accuracy, learning rate and model loss)
         if args.plot_name:
             draw_plots(args, plot_values, plot_valid_values)
+
 
 if __name__ == '__main__':
     main(parse_arguments())

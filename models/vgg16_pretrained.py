@@ -29,7 +29,7 @@ class VGG16PretrainedModel(BaseModel):
 
         # Specify where the model checkpoint is (pretrained weights).
         model_path = config.model_path
-        assert(model_path.is_file())
+        assert (model_path.is_file())
 
         # Restore only the layers up to fc7 (included)
         # Calling function `init_fn(sess)` will load all the pretrained weights.
@@ -69,7 +69,7 @@ class VGG16PretrainedModel(BaseModel):
         self._train_op = fc8_train_op
         self._full_train_op = full_train_op
         self._prediction = tf.nn.softmax(logits)
-        self._accuracy=accuracy
+        self._accuracy = accuracy
 
         self._summaries.append(tf.summary.scalar('Accuracy', accuracy))
         self._summaries.append(tf.summary.scalar('Loss', loss))
