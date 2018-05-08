@@ -49,7 +49,7 @@ class PerceptronConfig(BaseTrainingLoopConfig):
     lr_decay = 0.5 ** (1 / 2000)  # decrease lr by 50% in 2000 iterations
 
     # model config
-    hidden_size = [256, 128, 64]
+    hidden_size = [16, 128, 64]
     weights_init_stddev = 0.02
     enable_batchnorm = True
     activation_fun = tf.nn.relu

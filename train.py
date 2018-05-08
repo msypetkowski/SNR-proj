@@ -1,14 +1,14 @@
 import argparse
+import json
 import time
 from collections import defaultdict
-from pathlib import Path
 
 import tensorflow as tf
 
 import config
 import data
 import models
-import matplotlib.pyplot as plt
+from visualization import draw_plots
 
 
 def parse_arguments():
@@ -17,8 +17,9 @@ def parse_arguments():
                         dest='model_name', type=str, required=True)
     parser.add_argument('-t', '--model-type', help='Model type (perceptron, my_conv or vgg16_pretrained)',
                         dest='model_type', type=str, default='perceptron')
-    parser.add_argument('-p', '--plot-name', help='Save model training and validation summaries plot as plot_name.png',
-                        dest='plot_name', type=str, default=None)
+    parser.add_argument('-p', '--draw-plot', help='Save model training and validation summaries plot'
+                                                  'to files model_namel.{png, eps, json}',
+                        dest='draw_plot', action='store_true', default=False)
     return parser.parse_args()
 
 
@@ -49,24 +50,12 @@ def print_parameters_stat():
     print('Total trainable parameters: ', total_parameters)
 
 
-def draw_plots(args, plot_values, plot_valid_values):
-    for i, key in enumerate(set(list(plot_values.keys()) +
-                                        list(plot_valid_values.keys()))):
-        plt.subplot(311 + i)
-        plt.title(key)
-        plt.xlabel('Iteration')
-        plt.ylabel(key)
-        plt.grid(True)
-
-        # TODO: add legend in case there are both train and valid sumaries for the same key
-        for plt_values in (plot_values, plot_valid_values):
-            if key in plt_values:
-                values = plt_values[key]
-                plt.plot(*zip(*values))
-
-    plt.tight_layout()
-    plt.savefig(args.plot_name + '.png')
-    plt.show()
+def append_values_from_summaries(target, summaries, iteration):
+    summary_proto = tf.Summary().FromString(summaries)
+    val = summary_proto.value
+    while val:
+        v = val.pop()
+        target[v.tag].append((iteration, v.simple_value))
 
 
 def main(args):
@@ -74,7 +63,7 @@ def main(args):
     with tf.Session() as sess:
         img_features = tf.placeholder(tf.float32, (None,) + conf.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + conf.model_labels_shape, name='ImgLabels')
-        learning_rate = tf.placeholder(tf.float32, name='LearningRate')
+        learning_rate = tf.placeholder(tf.float32, name='Lr')
         is_training = tf.placeholder(tf.bool, shape=(), name='IsTraining')
 
         model = Model(img_features, labels, learning_rate, is_training=is_training, config=conf)
@@ -125,9 +114,8 @@ def main(args):
 
                 if i % conf.save_train_summaries_ratio == 0:
                     writer.add_summary(summaries, i)
-                    if args.plot_name:
-                        # TODO: add plot_values here
-                        pass
+                    if args.draw_plot:
+                        append_values_from_summaries(plot_values, summaries, i)
                 if i % conf.save_weights_ratio == 0 and i > 0:
                     saver.save(sess, model_dir, global_step=i)
 
@@ -139,15 +127,8 @@ def main(args):
                     writer.flush()
                     validation_writer.flush()
 
-                    if args.plot_name:
-                        # TODO: get values from summary object - like following:
-                        # summary_proto = tf.Summary().FromString(summaries)
-                        # for entry in summary_proto.value:
-                        #     ...
-
-                        plot_valid_values['Accuracy'].append((i, model.accuracy_fun(sess, img, lbl)))
-                        plot_valid_values['LearningRate'].append((i, lr))
-                        # plot_values['Loss'].append((i,loss))
+                    if args.draw_plot:
+                        append_values_from_summaries(plot_valid_values, summaries, i)
 
 
         except KeyboardInterrupt:
@@ -170,8 +151,11 @@ def main(args):
         print('ratio:', data_generation_time_sum / t)
 
         # save plots (accuracy, learning rate and model loss)
-        if args.plot_name:
-            draw_plots(args, plot_values, plot_valid_values)
+        if args.draw_plot:
+            plot_name = args.model_name
+            draw_plots(plot_name, plot_values, plot_valid_values, args.model_name)
+            with open(plot_name + '.json', 'w') as f:
+                f.write(json.dumps((plot_values, plot_valid_values)))
 
 
 if __name__ == '__main__':

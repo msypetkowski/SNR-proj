@@ -1,5 +1,4 @@
 from utils import group
-import numpy as np
 
 
 # TODO: move more methods / write abstracts here

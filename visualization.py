@@ -1,5 +1,8 @@
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.legend_handler import HandlerLine2D
+from scipy.interpolate import spline
 
 
 def merge_images(images, scale=1):
@@ -54,3 +57,33 @@ def show_image(img, bbox=None):
     key = cv2.waitKey(0)
     cv2.destroyAllWindows()
     return key
+
+
+def draw_plots(plot_name, plot_values, plot_valid_values, legend_name_prefix):
+    all_keys = set(list(plot_values.keys()) + list(plot_valid_values.keys()))
+    scale = 3
+    plt.figure(figsize=(3 * scale, len(all_keys) * scale))
+    for i, key in enumerate(all_keys):
+        plt.subplot(311 + i)
+        plt.title(key)
+        plt.xlabel('Training iteration')
+        plt.ylabel(key)
+        plt.grid(True)
+
+        lines = []
+        for plt_values, lbl_suffix in zip((plot_values, plot_valid_values), ("_training", "_validation")):
+            if key in plt_values:
+                label = legend_name_prefix + lbl_suffix
+                values = plt_values[key]
+                x, y = zip(*values)
+                xnew = np.linspace(min(x), max(x), 300)
+                power_smooth = spline(x, y, xnew)
+                lines.append(plt.plot(xnew, power_smooth, label=label)[0])
+                plt.plot(x, y, label=label, alpha=0.3, color=lines[-1].get_color())[0]
+        if len(lines) > 1:
+            plt.legend(handler_map={line: HandlerLine2D() for line in lines})
+
+    # plt.tight_layout()
+    plt.savefig(plot_name + '.png')
+    plt.savefig(plot_name + '.eps')
+    plt.show()

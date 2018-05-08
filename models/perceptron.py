@@ -23,16 +23,15 @@ class PerceptronModel(BaseModel):
             self._loss = tf.nn.softmax_cross_entropy_with_logits(
                 logits=self._model_output, labels=labels)
             self._loss = tf.reduce_mean(self._loss)
-
-            self._summaries.append(tf.summary.scalar('Loss', self._loss))
-            self._valid_summaries.append(self._summaries[-1])
+        self._summaries.append(tf.summary.scalar('Loss', self._loss))
+        self._valid_summaries.append(self._summaries[-1])
 
         with tf.name_scope('AccuracyStat'):
             is_correct = tf.equal(tf.argmax(self._prediction, 1),
                                   tf.argmax(labels, 1))
             self._accuracy = tf.reduce_mean(tf.cast(is_correct, tf.float32))
-            self._summaries.append(tf.summary.scalar('Accuracy', self._accuracy))
-            self._valid_summaries.append(self._summaries[-1])
+        self._summaries.append(tf.summary.scalar('Accuracy', self._accuracy))
+        self._valid_summaries.append(self._summaries[-1])
 
         self._summaries.append(tf.summary.scalar('LearningRate', learning_rate))
 

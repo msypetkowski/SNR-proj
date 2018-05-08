@@ -5,10 +5,9 @@ wget http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz
 tar -xvf vgg_16_2016_08_28.tar.gz
 
 """
-from pathlib import Path
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-import tensorflow.contrib.slim.nets
+
 from .base_model import BaseModel
 
 

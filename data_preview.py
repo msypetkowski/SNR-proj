@@ -3,7 +3,6 @@ TODO: more visualizations - hog images, training and test set,
 precission-recall plot, etc.
 """
 import argparse
-from pathlib import Path
 
 from data import *
 from eval import predict_classes
