@@ -106,6 +106,8 @@ We tested 2 models with different activation functions:
     \item relu
     \item sigmoid
 \end{itemize}
+
+\clearpage
 Visualization of the model is shown in figure \ref{fig:arch}.
 
 % TODO: draw different - more simple schema instead of tensorboard printscreen
@@ -117,7 +119,7 @@ Visualization of the model is shown in figure \ref{fig:arch}.
 \end{figure}
 
 \subsection{Training and results}
-Accuracy and loss curves on training and validation set are shown in figure \ref{fig:training}.
+Accuracy and loss curves on training and validation set are shown in figures \ref{fig:training_accuracy} and \ref{fig:training_loss}.
 Training and validation curves diverge from the begining because of small dataset (one epoch is around 20 iterations).
 Because of batch normalization, validation accuracy increases along with training accuracy (but slower).
 Full results on testset for the model using relu are shown in figure \ref{fig:eval}.
@@ -126,14 +128,23 @@ Sigmoid model achieves slightly lower accuracy around 21\% (nothing unusual here
 
 % TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
 \begin{figure}[H]
-    \caption[]{Accuracy and loss curves}
+    \caption[]{Accuracy graph for a multi-layer perceptron.}
     \centering
-    \includegraphics[page=2,width=1.0\textwidth]{training.png}
-    \label{fig:training}
+    \includegraphics[page=2,width=1.0\textwidth]{training_accuracy.png}
+    \label{fig:training_accuracy}
 \end{figure}
 
 \begin{figure}[H]
-    \caption[]{Results on testset (blue - good answers)}
+    \caption[]{Loss graph for a multi-layer perceptron.}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{training_loss.png}
+    \label{fig:training_loss}
+\end{figure}
+
+
+
+\begin{figure}[H]
+    \caption[]{Results on testset (blue - correct answers)}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{eval.png}
     \label{fig:eval}
@@ -147,19 +158,26 @@ Sigmoid model achieves slightly lower accuracy around 21\% (nothing unusual here
 We trained for 1500 iterations 8-th layer of VGG16\cite{VGG16}
 pretrained on ImageNet\cite{ImageNet} dataset.
 Then we finetuned it for 1000 iterations achieving final accuracy of 67\%.
-Training and validation curves are shown in figure \ref{fig:trainingVGG}.
+Training and validation curves are shown in figures \ref{fig:trainingVGG_accuracy} and \ref{fig:trainingVGG_loss}.
 Full results on testset shown in figure \ref{fig:evalVGG}.
 The ckpt file is downloaded from \url{http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz}.
 
 \begin{figure}[h]
-    \caption[]{Accuracy and loss curves of VGG16 pretrained model}
+    \caption[]{Accuracy graph for the VGG16 pretrained model.}
     \centering
-    \includegraphics[page=2,width=1.0\textwidth]{vggTraining.png}
-    \label{fig:trainingVGG}
+    \includegraphics[page=2,width=1.0\textwidth]{vggTraining_accuracy.png}
+    \label{fig:trainingVGG_accuracy}
 \end{figure}
 
 \begin{figure}[h]
-    \caption[]{Results on testset of VGG16 finetuned model (blue - good answers)}
+    \caption[]{Loss graph for the VGG16 pretrained model.}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{vggTraining_loss.png}
+    \label{fig:trainingVGG_loss}
+\end{figure}
+
+\begin{figure}[h]
+    \caption[]{Results on testset of VGG16 finetuned model (blue - correct answers).}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{evalVGG.png}
     \label{fig:evalVGG}
