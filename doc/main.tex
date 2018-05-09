@@ -10,21 +10,21 @@
 \usepackage[utf8]{inputenc}
 \begin{document}
 
-\begin{titlepage}
+% \begin{titlepage}
 \title{SNR classes project - birds species recognition using deep neural networks
 - first stage report}
 
 \author{Michał Sypetkowski, Marcin Lew, Filip Smurawa}
 \maketitle
-\end{titlepage}
+% \end{titlepage}
 
 
 
 
 
-\tableofcontents
-\addcontentsline{toc}{section}{Contents}
-\newpage
+% \tableofcontents
+% \addcontentsline{toc}{section}{Contents}
+% \newpage
 
 \section{General information}
 Git repository \url{https://github.com/msypetkowski/SNR-proj.git}.
@@ -72,7 +72,7 @@ Corresponding augmented examples are shown in figure \ref{fig:aug2}.
 \begin{figure}[h]
     \caption[]{Augmented examples corresponding to raw example in figure \ref{fig:aug1}}
     \centering
-    \includegraphics[page=2,width=1.0\textwidth]{aug2.png}
+    \includegraphics[page=2,width=0.7\textwidth]{aug2.png}
     \label{fig:aug2}
 \end{figure}
 
@@ -96,7 +96,7 @@ We directly feed such vectors into our network.
 \subsection{Model architecture}
 We selected the architecture by experimenting.
 Our network has 3 hidden dense layers of sizes 256, 128 and 64.
-Since we have small dataset, larger models tended overfitting
+Since we have small dataset, larger models tended to overfit
 (despite of augmentation).
 Each of these layers have corresponding batch normalization layer.
 After the last layer there is a softmax function.
@@ -107,14 +107,13 @@ We tested 2 models with different activation functions:
     \item sigmoid
 \end{itemize}
 
-\clearpage
 Visualization of the model is shown in figure \ref{fig:arch}.
 
 % TODO: draw different - more simple schema instead of tensorboard printscreen
-\begin{figure}[H]
+\begin{figure}[h]
     \caption[]{Visualization of multilayer perceptron architecture (relu activation variant)}
     \centering
-    \includegraphics[page=1,width=1.0\textwidth]{architecture.pdf}
+    \includegraphics[page=1,width=0.6\textwidth]{architecture.pdf}
     \label{fig:arch}
 \end{figure}
 
@@ -123,18 +122,22 @@ Accuracy and loss curves on training and validation set are shown in figures \re
 Training and validation curves diverge from the begining because of small dataset (one epoch is around 20 iterations).
 Because of batch normalization, validation accuracy increases along with training accuracy (but slower).
 Full results on testset for the model using relu are shown in figure \ref{fig:eval}.
+
 Final accuracy of relu model is around 24\%.
-Sigmoid model achieves slightly lower accuracy around 21\% (nothing unusual here).
+Sigmoid model achieves slightly lower accuracy (around 21\%).
+Nowadays, it is a common knowledge that using relu as activation function
+usually gives faster and better results i. a. for classification tasks;
+hence the result is not surprising.
 
 % TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
-\begin{figure}[H]
+\begin{figure}[h]
     \caption[]{Accuracy graph for a multi-layer perceptron.}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{training_accuracy.png}
     \label{fig:training_accuracy}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
     \caption[]{Loss graph for a multi-layer perceptron.}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{training_loss.png}
@@ -143,14 +146,13 @@ Sigmoid model achieves slightly lower accuracy around 21\% (nothing unusual here
 
 
 
-\begin{figure}[H]
+\begin{figure}[h]
     \caption[]{Results on testset (blue - correct answers)}
     \centering
-    \includegraphics[page=2,width=1.0\textwidth]{eval.png}
+    \includegraphics[page=2,width=0.8\textwidth]{eval.png}
     \label{fig:eval}
 \end{figure}
 
-\newpage
 \section{Convolutional neural networks}
 
 \subsection{Ground truth model}
@@ -158,28 +160,28 @@ Sigmoid model achieves slightly lower accuracy around 21\% (nothing unusual here
 We trained for 1500 iterations 8-th layer of VGG16\cite{VGG16}
 pretrained on ImageNet\cite{ImageNet} dataset.
 Then we finetuned it for 1000 iterations achieving final accuracy of 67\%.
-Training and validation curves are shown in figures \ref{fig:trainingVGG_accuracy} and \ref{fig:trainingVGG_loss}.
+Training and validation curves are shown in figure \ref{fig:trainingVGG_accuracy}. % and \ref{fig:trainingVGG_loss}.
 Full results on testset shown in figure \ref{fig:evalVGG}.
 The ckpt file is downloaded from \url{http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz}.
 
 \begin{figure}[h]
-    \caption[]{Accuracy graph for the VGG16 pretrained model.}
+    \caption[]{Training and validation accuracy curves for the VGG16 pretrained model.}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{vggTraining_accuracy.png}
     \label{fig:trainingVGG_accuracy}
 \end{figure}
 
-\begin{figure}[h]
-    \caption[]{Loss graph for the VGG16 pretrained model.}
-    \centering
-    \includegraphics[page=2,width=1.0\textwidth]{vggTraining_loss.png}
-    \label{fig:trainingVGG_loss}
-\end{figure}
+% \begin{figure}[h]
+%     \caption[]{Loss graph for the VGG16 pretrained model.}
+%     \centering
+%     \includegraphics[page=2,width=1.0\textwidth]{vggTraining_loss.png}
+%     \label{fig:trainingVGG_loss}
+% \end{figure}
 
 \begin{figure}[h]
     \caption[]{Results on testset of VGG16 finetuned model (blue - correct answers).}
     \centering
-    \includegraphics[page=2,width=1.0\textwidth]{evalVGG.png}
+    \includegraphics[page=2,width=0.8\textwidth]{evalVGG.png}
     \label{fig:evalVGG}
 \end{figure}
 
