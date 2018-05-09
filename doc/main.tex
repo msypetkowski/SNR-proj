@@ -1,4 +1,4 @@
-﻿\documentclass[a4paper]{article}
+\documentclass[a4paper]{article}
 
 \usepackage[a4paper,  margin=1.0in]{geometry}
 
@@ -10,21 +10,30 @@
 \usepackage[utf8]{inputenc}
 \begin{document}
 
-
+\begin{titlepage}
 \title{SNR classes project - birds species recognition using deep neural networks
 - first stage report}
 
 \author{Michał Sypetkowski, Marcin Lew, Filip Smurawa}
 \maketitle
+\end{titlepage}
+
+
+
+
+
+\tableofcontents
+\addcontentsline{toc}{section}{Contents}
+\newpage
 
 \section{General information}
 Git repository \url{https://github.com/msypetkowski/SNR-proj.git}.
 We use the following tools:
 \begin{itemize}
-    \item \textbf{Python}\footnote{\url{https://www.python.org/}}
-    \item \textbf{OpenCV}\footnote{\url{https://opencv.org/}}
-    \item \textbf{NumPy}\footnote{\url{http://www.numpy.org/}}
-    \item \textbf{TensorFlow}\footnote{\url{https://www.tensorflow.org/ }}
+    \item \textbf{Python}\cite{Python}
+    \item \textbf{OpenCV}\cite{OpenCV}
+    \item \textbf{NumPy}\cite{NumPy}
+    \item \textbf{TensorFlow}\cite{TensorFlow}
 \end{itemize}
 We also use Tensorboard for model and training progress visualization.
 The project is tested to run in Linux environment.
@@ -135,8 +144,8 @@ Sigmoid model achieves slightly lower accuracy around 21\% (nothing unusual here
 
 \subsection{Ground truth model}
 
-We trained for 1500 iterations 8-th layer of VGG16\footnote{\url{https://arxiv.org/abs/1409.1556}}
-pretrained on ImageNet\footnote{\url{https://arxiv.org/abs/1409.0575}} dataset.
+We trained for 1500 iterations 8-th layer of VGG16\cite{VGG16}
+pretrained on ImageNet\cite{ImageNet} dataset.
 Then we finetuned it for 1000 iterations achieving final accuracy of 67\%.
 Training and validation curves are shown in figure \ref{fig:trainingVGG}.
 Full results on testset shown in figure \ref{fig:evalVGG}.
@@ -164,6 +173,23 @@ The ckpt file is downloaded from \url{http://download.tensorflow.org/models/vgg_
 % We are planning to use {ResNet}\footnote{\url{https://arxiv.org/abs/1512.03385}}
 % as a baseline model.
 
+\clearpage
+\begin{thebibliography}{99}
+\addcontentsline{toc}{section}{References}
 
+\bibitem{TensorFlow} Google Brain team. \url{https://www.tensorflow.org/}, (09.05.2018).
+
+\bibitem{NumPy} NumPy developers. \url{http://www.numpy.org/}, (09.05.2018).
+
+\bibitem{OpenCV} OpenCV team. \url{https://opencv.org/}, (09.05.2018).
+
+\bibitem{Python} Python Software Foundation. \url{https://www.python.org/}, (09.05.2018).
+
+\bibitem{ImageNet}Russakovsky O., Deng J., Su H., Krause J., Satheesh S., Ma S., Huang Z., Karpathy A., Khosla A., Bernstein M., Berg A. C., Fei-Fei L.: \textit{ImageNet Large Scale Visual Recognition Challenge}, 2014. 
+\url{https://arxiv.org/abs/1409.0575}, (09.05.2018).
+
+\bibitem{VGG16}Simonyan K., Zisserman A.: \textit{Very Deep Convolutional Networks for Large-Scale Image Recognition}, 2014. \url{https://arxiv.org/abs/1409.1556}, (09.05.2018).
+
+\end{thebibliography}
 
 \end{document}
