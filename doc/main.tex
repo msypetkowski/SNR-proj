@@ -1,6 +1,6 @@
 \documentclass[a4paper]{article}
 
-\usepackage[a4paper,  margin=0.7in]{geometry}
+\usepackage[a4paper,  margin=0.5in]{geometry}
 % \usepackage[left=2.5cm,top=3cm,right=2.5cm,bottom=3cm,bindingoffset=0.5cm]{geometry}
 
 \usepackage{graphicx}
@@ -108,11 +108,7 @@ Since we have small dataset, larger models tended to overfit
 Each of these layers have corresponding batch normalization\cite{Batchnorm} layer.
 After the last layer there is a softmax function.
 We use cross entropy as a loss function.
-We tested 2 models with different activation functions:
-\begin{itemize}
-    \item relu
-    \item sigmoid
-\end{itemize}
+We tested 2 models with different activation functions -- relu and sigmoid.
 
 Visualization of the model (with relu activation) is shown in figure \ref{fig:arch}.
 
@@ -152,20 +148,36 @@ Training and validation curves are shown in figure \ref{fig:trainingVGG_accuracy
 Full results on testset shown in figure \ref{fig:evalVGG}.
 The ckpt file is downloaded from \url{http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz}.
 
+\subsection{Next stage plans}
+
+We are planning to experiment with convolutional neural network architectures
+without using pretrained models.
+i.a. with:
+\begin{itemize}
+    \item convolutional layers count
+    \item loss function
+    \item activation function
+    \item using SVM (with various exponential kernels) after the last network layer
+
+\end{itemize}
+
+
+
+
 \end{multicols}
 
 % TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
 \begin{figure}[h]
     \caption[]{Accuracy graph for a multi-layer perceptron.}
     \centering
-    \includegraphics[page=2,width=1.0\textwidth]{training_accuracy.png}
+    \includegraphics[page=2,width=0.9\textwidth]{training_accuracy.png}
     \label{fig:training_accuracy}
 \end{figure}
 
 \begin{figure}[h]
     \caption[]{Loss graph for a multi-layer perceptron.}
     \centering
-    \includegraphics[page=2,width=1.0\textwidth]{training_loss.png}
+    \includegraphics[page=2,width=0.9\textwidth]{training_loss.png}
     \label{fig:training_loss}
 \end{figure}
 
