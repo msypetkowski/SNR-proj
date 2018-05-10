@@ -1,10 +1,12 @@
 \documentclass[a4paper]{article}
 
-\usepackage[a4paper,  margin=1.0in]{geometry}
+\usepackage[a4paper,  margin=0.3in]{geometry}
+% \usepackage[left=2.5cm,top=3cm,right=2.5cm,bottom=3cm,bindingoffset=0.5cm]{geometry}
 
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{hyperref}
+\usepackage{multicol}
 
 
 \usepackage[utf8]{inputenc}
@@ -25,6 +27,9 @@
 % \tableofcontents
 % \addcontentsline{toc}{section}{Contents}
 % \newpage
+
+
+\begin{multicols}{2}
 
 \section{General information}
 Git repository \url{https://github.com/msypetkowski/SNR-proj.git}.
@@ -62,20 +67,21 @@ Instead we attach an example visualization.
 Raw -- unaugmented example is shown in figure \ref{fig:aug1}.
 Corresponding augmented examples are shown in figure \ref{fig:aug2}.
 
-\begin{figure}[h]
+% TODO: was there a special name for unaugmened examples ?
+
+\begin{figure}[H]
     \caption[]{Not augmented example}
     \centering
     \includegraphics[page=2,width=0.1\textwidth]{aug1.png}
     \label{fig:aug1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \caption[]{Augmented examples corresponding to raw example in figure \ref{fig:aug1}}
     \centering
-    \includegraphics[page=2,width=0.7\textwidth]{aug2.png}
+    \includegraphics[page=2,width=0.5\textwidth]{aug2.png}
     \label{fig:aug2}
 \end{figure}
-
 
 \subsection{HOG features}
 To get HOG features, we first resize an image to 128x64x3.
@@ -84,6 +90,7 @@ Then we calculate the features using OpenCV library:
     hog = cv2.HOGDescriptor()
     fd = hog.compute(img).flatten()
 \end{verbatim}
+
 Image is first divided into 8x8 cells (in result, we get 16 * 8 cells).
 We use gradient orientation bins of size 9.
 Then the algorithm takes 16x16 blocks (4 cells) --
@@ -97,7 +104,7 @@ We directly feed such vectors into our network.
 We selected the architecture by experimenting.
 Our network has 3 hidden dense layers of sizes 256, 128 and 64.
 Since we have small dataset, larger models tended to overfit
-(despite of augmentation).
+(despite of data augmentation).
 Each of these layers have corresponding batch normalization layer.
 After the last layer there is a softmax function.
 We use cross entropy as a loss function.
@@ -107,15 +114,16 @@ We tested 2 models with different activation functions:
     \item sigmoid
 \end{itemize}
 
-Visualization of the model is shown in figure \ref{fig:arch}.
+Visualization of the model (with relu activation) is shown in figure \ref{fig:arch}.
 
 % TODO: draw different - more simple schema instead of tensorboard printscreen
-\begin{figure}[h]
+\begin{figure}[H]
     \caption[]{Visualization of multilayer perceptron architecture (relu activation variant)}
     \centering
-    \includegraphics[page=1,width=0.6\textwidth]{architecture.pdf}
+    \includegraphics[page=1,width=0.5\textwidth]{architecture.pdf}
     \label{fig:arch}
 \end{figure}
+
 
 \subsection{Training and results}
 Accuracy and loss curves on training and validation set are shown in figures \ref{fig:training_accuracy} and \ref{fig:training_loss}.
@@ -128,6 +136,23 @@ Sigmoid model achieves slightly lower accuracy (around 21\%).
 Nowadays, it is a common knowledge that using relu as activation function
 usually gives faster and better results i. a. for classification tasks;
 hence the result is not surprising.
+
+
+
+
+
+\section{Convolutional neural networks}
+
+\subsection{Ground truth model}
+
+We trained for 1500 iterations 8-th layer of VGG16\cite{VGG16}
+pretrained on ImageNet\cite{ImageNet} dataset.
+Then we finetuned it for 1000 iterations achieving final accuracy of 67\%.
+Training and validation curves are shown in figure \ref{fig:trainingVGG_accuracy}. % and \ref{fig:trainingVGG_loss}.
+Full results on testset shown in figure \ref{fig:evalVGG}.
+The ckpt file is downloaded from \url{http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz}.
+
+\end{multicols}
 
 % TODO: hide the fact that this is tensorboard printscreen or do other - external visualization
 \begin{figure}[h]
@@ -144,27 +169,7 @@ hence the result is not surprising.
     \label{fig:training_loss}
 \end{figure}
 
-
-
-\begin{figure}[h]
-    \caption[]{Results on testset (blue - correct answers)}
-    \centering
-    \includegraphics[page=2,width=0.8\textwidth]{eval.png}
-    \label{fig:eval}
-\end{figure}
-
-\section{Convolutional neural networks}
-
-\subsection{Ground truth model}
-
-We trained for 1500 iterations 8-th layer of VGG16\cite{VGG16}
-pretrained on ImageNet\cite{ImageNet} dataset.
-Then we finetuned it for 1000 iterations achieving final accuracy of 67\%.
-Training and validation curves are shown in figure \ref{fig:trainingVGG_accuracy}. % and \ref{fig:trainingVGG_loss}.
-Full results on testset shown in figure \ref{fig:evalVGG}.
-The ckpt file is downloaded from \url{http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz}.
-
-\begin{figure}[h]
+\begin{figure}[H]
     \caption[]{Training and validation accuracy curves for the VGG16 pretrained model.}
     \centering
     \includegraphics[page=2,width=1.0\textwidth]{vggTraining_accuracy.png}
@@ -178,11 +183,19 @@ The ckpt file is downloaded from \url{http://download.tensorflow.org/models/vgg_
 %     \label{fig:trainingVGG_loss}
 % \end{figure}
 
+
 \begin{figure}[h]
     \caption[]{Results on testset of VGG16 finetuned model (blue - correct answers).}
     \centering
-    \includegraphics[page=2,width=0.8\textwidth]{evalVGG.png}
+    \includegraphics[page=2,width=1.0\textwidth]{evalVGG.png}
     \label{fig:evalVGG}
+\end{figure}
+
+\begin{figure}[h]
+    \caption[]{Results on testset of small model that uses HOG features (blue - correct answers)}
+    \centering
+    \includegraphics[page=2,width=1.0\textwidth]{eval.png}
+    \label{fig:eval}
 \end{figure}
 
 
