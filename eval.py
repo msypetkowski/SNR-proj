@@ -2,7 +2,8 @@ import glob
 
 import tensorflow as tf
 
-from train import get_model_and_config, parse_arguments
+from train import parse_arguments
+from models import get_model_and_config
 
 
 def list_model_checkpoints(model_name, model_dir):

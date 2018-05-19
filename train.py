@@ -5,9 +5,8 @@ from collections import defaultdict
 
 import tensorflow as tf
 
-import config
 import data
-import models
+from models import get_model_and_config
 from visualization import draw_plots
 
 
@@ -15,27 +14,12 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Multilayer perceptron training for birds recogntion.')
     parser.add_argument('-n', '--model-name', help='Model name',
                         dest='model_name', type=str, required=True)
-    parser.add_argument('-t', '--model-type', help='Model type (perceptron, my_conv or vgg16_pretrained)',
+    parser.add_argument('-t', '--model-type', help='Model type (Perceptron, MyConv or VGG16Pretrained)',
                         dest='model_type', type=str, default='perceptron')
     parser.add_argument('-p', '--draw-plot', help='Save model training and validation summaries plot'
                                                   'to files model_namel.{png, eps, json}',
                         dest='draw_plot', action='store_true', default=False)
     return parser.parse_args()
-
-
-def get_model_and_config(args):
-    if args.model_type == 'perceptron':
-        conf = config.PerceptronConfig
-        Model = models.perceptron.PerceptronModel
-    elif args.model_type == 'my_conv':
-        conf = config.MyConvConfig
-        Model = models.my_conv.MyConvModel
-    elif args.model_type == 'vgg16_pretrained':
-        conf = config.VGG16PretrainedConfig
-        Model = models.vgg16_pretrained.VGG16PretrainedModel
-    else:
-        raise ValueError("Model type {} not supported".format(args.model_type))
-    return Model, conf
 
 
 def print_parameters_stat():

@@ -6,7 +6,7 @@ import argparse
 
 from data import *
 from eval import predict_classes
-from train import get_model_and_config
+from models import get_model_and_config
 from utils import group
 from visualization import merge_images_with_border, show_image, make_border
 
