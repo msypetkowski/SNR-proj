@@ -1,5 +1,5 @@
 """
-Data and model configuration.
+Data and models configuration.
 """
 
 import glob
@@ -55,7 +55,8 @@ class PerceptronConfig(BaseTrainingLoopConfig):
     # activation_fun = tf.sigmoid
 
 
-class MyConvConfig(PerceptronConfig):
+# 1695858 parameters
+class MyConvConfigMedium(PerceptronConfig):
     # training config
     batch_size = 128
     max_training_steps = 5000
@@ -77,10 +78,42 @@ class MyConvConfig(PerceptronConfig):
         ((5, 5),        (2, 2),     64),
         ((3, 3),        (2, 2),     128),
         ((2, 2),        (1, 1),     128),
-        ((2, 2),        (1, 1),     256),  # 3x3
+        ((2, 2),        (1, 1),     128),  # 4x4
     ]
-    dense_hidden_size = [512, 256]
+    dense_hidden_size = [512]
 
+# 1527538 parameters
+class MyConvConfigLessLayers(MyConvConfigMedium):
+    hidden_size = [
+        # filter size   strides     output depth
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (4, 4),     64), #  larger strides
+        # ((5, 5),        (2, 2),     64),
+        ((5, 5),        (2, 2),     64),
+        ((3, 3),        (2, 2),     128),
+        # ((2, 2),        (1, 1),     128),
+        ((2, 2),        (1, 1),     128),  # 4x4
+    ]
+
+# 1966706 parameters
+class MyConvConfigMoreLayers(MyConvConfigMedium):
+    hidden_size = [
+        # filter size   strides     output depth
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (1, 1),     64),  # additional
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (1, 1),     64),  # additional
+        ((3, 3),        (2, 2),     128),
+        ((2, 2),        (1, 1),     128),
+        ((2, 2),        (1, 1),     128),  # additional
+        ((2, 2),        (1, 1),     128),  # 4x4
+    ]
+
+MyConvConfig = MyConvConfigMedium
 
 class VGG16PretrainedConfig(BaseTrainingLoopConfig):
     model_img_features_shape = (*[224] * 2, 3)
