@@ -1,3 +1,4 @@
+#!/bin/env python3
 """
 TODO: more visualizations - hog images, training and test set,
 precission-recall plot, etc.
@@ -35,8 +36,8 @@ def parse_arguments():
                         dest='eval', action='store_true', default=False)
     parser.add_argument('-n', '--model-name', help='Model name',
                         dest='model_name', type=str, required=False)
-    parser.add_argument('-t', '--model-type', help='Model type (currently only perceptron is supported)',
-                        dest='model_type', type=str, default='perceptron')
+    parser.add_argument('-t', '--model-type', help='Model type (like in train.py)',
+                        dest='model_type', type=str, default='MyConv')
 
     return parser.parse_args()
 
@@ -91,7 +92,7 @@ def view_train(args):
 
 
 def view_aug(args):
-    data = [read_raw(2)[1]]
+    data = read_raw(2)[1:2]
     images, _ = next(iter(batch_generator(data, args.view_count, use_hog=args.view_hog)))
     show_image(get_unaugmented(data, use_hog=args.view_hog)[0][0])
     show_image(merge_images_with_border(images))

@@ -1,3 +1,4 @@
+#!/bin/env python3
 import argparse
 import json
 import time
@@ -15,7 +16,7 @@ def parse_arguments():
     parser.add_argument('-n', '--model-name', help='Model name',
                         dest='model_name', type=str, required=True)
     parser.add_argument('-t', '--model-type', help='Model type (Perceptron, MyConv or VGG16Pretrained)',
-                        dest='model_type', type=str, default='perceptron')
+                        dest='model_type', type=str, default='MyConv')
     parser.add_argument('-p', '--draw-plot', help='Save model training and validation summaries plot'
                                                   'to files model_namel.{png, eps, json}',
                         dest='draw_plot', action='store_true', default=False)

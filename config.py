@@ -38,17 +38,16 @@ class BaseTrainingLoopConfig(BaseConfig):
 
 
 class PerceptronConfig(BaseTrainingLoopConfig):
-    model_img_features_shape = (BaseConfig.hog_feature_size,)
-    model_labels_shape = (BaseConfig.classes_count,)
-    model_output_shape = model_labels_shape
-    use_hog = True
-
     # training config
     batch_size = 128
     initial_lr = 0.01
     lr_decay = 0.5 ** (1 / 2000)  # decrease lr by 50% in 2000 iterations
 
     # model config
+    model_img_features_shape = (BaseConfig.hog_feature_size,)
+    model_labels_shape = (BaseConfig.classes_count,)
+    model_output_shape = model_labels_shape
+    use_hog = True
     hidden_size = [16, 128, 64]
     weights_init_stddev = 0.02
     enable_batchnorm = True
@@ -57,19 +56,30 @@ class PerceptronConfig(BaseTrainingLoopConfig):
 
 
 class MyConvConfig(PerceptronConfig):
+    # training config
+    batch_size = 128
+    max_training_steps = 5000
+    save_weights_ratio = 1000
+    initial_lr = 0.03
+    lr_decay = 0.5 ** (1 / 1000)  # decrease lr by 50% in 1000 iterations
+
+    # model config
     model_img_features_shape = (*[BaseConfig.feed_ready_image_size] * 2, 3)
     use_hog = False
+    use_max_pool = True
+    # when use_max_pool enabled, given stride is used by max polling layers
     hidden_size = [
         # filter size   strides     output depth
         ((5, 5),        (2, 2),     64),
         ((5, 5),        (2, 2),     64),
-        ((5, 5),        (1, 1),     64),
-        ((5, 5),        (1, 1),     64),
         ((5, 5),        (2, 2),     64),
-        ((5, 5),        (1, 1),     128),
-        ((5, 5),        (1, 1),     128),
-        ((5, 5),        (2, 2),     256),  # 8x8
+        ((5, 5),        (2, 2),     64),
+        ((5, 5),        (2, 2),     64),
+        ((3, 3),        (2, 2),     128),
+        ((2, 2),        (1, 1),     128),
+        ((2, 2),        (1, 1),     256),  # 3x3
     ]
+    dense_hidden_size = [512, 256]
 
 
 class VGG16PretrainedConfig(BaseTrainingLoopConfig):
