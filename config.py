@@ -82,6 +82,7 @@ class MyConvConfigMedium(PerceptronConfig):
     ]
     dense_hidden_size = [512]
 
+
 # 1527538 parameters
 class MyConvConfigLessLayers(MyConvConfigMedium):
     hidden_size = [
@@ -95,6 +96,7 @@ class MyConvConfigLessLayers(MyConvConfigMedium):
         # ((2, 2),        (1, 1),     128),
         ((2, 2),        (1, 1),     128),  # 4x4
     ]
+
 
 # 1966706 parameters
 class MyConvConfigMoreLayers(MyConvConfigMedium):
@@ -113,7 +115,9 @@ class MyConvConfigMoreLayers(MyConvConfigMedium):
         ((2, 2),        (1, 1),     128),  # 4x4
     ]
 
+
 MyConvConfig = MyConvConfigMedium
+
 
 class VGG16PretrainedConfig(BaseTrainingLoopConfig):
     model_img_features_shape = (*[224] * 2, 3)
