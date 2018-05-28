@@ -1,6 +1,6 @@
 \documentclass[a4paper]{article}
 
-\usepackage[a4paper,  margin=0.5in]{geometry}
+\usepackage[a4paper,  margin=0.4in]{geometry}
 % \usepackage[left=2.5cm,top=3cm,right=2.5cm,bottom=3cm,bindingoffset=0.5cm]{geometry}
 
 \usepackage{graphicx}
@@ -17,18 +17,18 @@
 - second stage report}
 
 \author{Michał Sypetkowski, Marcin Lew}
+\twocolumn
 \maketitle
 
 
-\begin{multicols}{2}
-
 \section{General information}
-Git repository: 
-\url{https://github.com/msypetkowski/SNR-proj.git}.
-Previous stage report: 
+Git repository:\newline
+\url{https://github.com/msypetkowski/SNR-proj.git}.\newline
+Previous stage report: \newline
 \url{https://github.com/msypetkowski/SNR-proj/blob/master/doc/main.pdf}.
 
 \section{Establishing Layers count}
+\label{expLayer}
 
 First, we experiment with layers count.
     We trained 3 different models (they have respectively 11, 8 and 6 layers).
@@ -41,7 +41,7 @@ Rounded total trainable parameters count is respectively: 2.0M, 1.7M  and 1.5M.
 Batch normalization with relu activation layers are used in all these models,
 where the horizontal lines occur in the tables.
 
-\begin{table}[H]
+\begin{table}[!hbt]
     \caption{ 11 layer convolutional NN architcture
     \label{table:layers11}
     }
@@ -93,7 +93,7 @@ where the horizontal lines occur in the tables.
 \end{center}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[!hbt]
     \caption{ 8 layer convolutional NN architcture (layer names correspond to some layers names in 11 layer architecture \ref{table:layers11})
     \label{table:layers8}
     }
@@ -138,7 +138,7 @@ where the horizontal lines occur in the tables.
 
 
 
-\begin{table}[H]
+\begin{table}[!hbt]
     \caption{ 6 layer convolutional NN architcture (layer names correspond to some layers names in 11 layer architecture \ref{table:layers11})
     \label{table:layers6}
     }
@@ -183,19 +183,39 @@ Accuracy curves are shown in figure \ref{fig:layersAcc}.
 Training accuracy increases faster for models with fewer layers.
 Smaller networks naturally learn faster, but they have fewer degrees of freedom
 and may get worse results in the end.
-11 Layes network architecture shown to be too complicated for
-our dataset and training method.
-Best accuracy was achieved by medium -- 8 layer network.
+11-layer network architecture shown to be too complicated for
+our dataset and/or training method.
+Best accuracy was achieved by medium -- 8-layer network.
 We use this architecture for further experiments.
 
-\begin{figure}[H]
-    \caption[]{Accuracy curves for models with different layers count}
+\begin{figure}[!hbt]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{curvesLayers.png}
     \label{fig:layersAcc}
+    \caption[]{Accuracy curves for models with different layers count}
 \end{figure}
 
-\end{multicols}
+\section{Experiments with last convolutional layer size}
+
+Our 8-layer network from section \ref{expLayer}, outputs
+feature vectors of size 2048 from the last (see Conv11 in table \ref{table:layers8}) convolutional layer (after flattening).
+We tried models with 1024 and 4096 sizes of these vectors.
+The results are shown are shown in figure \ref{fig:lastSize}.
+These dimensions significiantly affect total trainable parameters count
+(around 11M in case of 1024 dimensions and around 28M in case of 4096 dimensions).
+Decreasing or increasing this parameter caused only loss in accuracy
+(models have in the end not enough or too many parameters for our dataset).
+% 1024 1138674
+% 4096 2810226
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[page=2,width=0.5\textwidth]{lastConvSize.png}
+    \label{fig:lastSize}
+    \caption[]{Accuracy curves for models with different last convolutional layer size}
+\end{figure}
+
+
 
 
 \end{document}
