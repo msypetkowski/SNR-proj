@@ -7,6 +7,7 @@ tar -xvf vgg_16_2016_08_28.tar.gz
 """
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
+import tensorflow.contrib.slim.nets as nets
 
 from .base_model import BaseModel
 
@@ -21,7 +22,7 @@ class VGG16PretrainedModel(BaseModel):
 
         self._summaries.append(tf.summary.scalar('LearningRate', learning_rate))
 
-        vgg = tf.contrib.slim.nets.vgg
+        vgg = nets.vgg
         with slim.arg_scope(vgg.vgg_arg_scope(weight_decay=config.weight_decay)):
             logits, _ = vgg.vgg_16(images, num_classes=config.classes_count, is_training=is_training,
                                    dropout_keep_prob=config.dropout_keep_prob)

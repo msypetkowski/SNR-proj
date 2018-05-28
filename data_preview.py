@@ -55,6 +55,9 @@ def view_raw(args):
         # images, _ = zip(*starmap(lambda *args1: process_one_example(*args1, use_hog=args.view_hog), d))
         # show_image(merge_images_with_border([cv2.resize(i, (150, 150)) for i in images]))
 
+def decorate_images(images, is_correct):
+    return [make_border(img, color=(int(cor) * 255, 0, int(not cor) * 255))
+            for img, cor in zip(images, is_correct)]
 
 def view_test(args):
     _, conf = get_model_and_config(args)
@@ -71,8 +74,7 @@ def view_test(args):
         assert len(is_correct) == len(images)
         print('good answers:', sum(is_correct))
         print('accuracy:', sum(is_correct) / len(is_correct))
-        images = [make_border(img, color=(int(cor) * 255, 0, int(not cor) * 255))
-                  for img, cor in zip(images, is_correct)]
+        images = decorate_images(images, is_correct)
         show_image(merge_images(images, scale=0.5))
     else:
         # show_image(merge_images_with_border([cv2.resize(i, (100, 100)) for i in images]))

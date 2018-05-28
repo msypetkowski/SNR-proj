@@ -16,11 +16,13 @@ class BaseModel:
     def eval_op(self):
         return self._prediction
 
-    def eval_fun(self, sess, images):
+    def eval_fun(self, sess, images, tensor=None):
         # avoid OOM error by grouping into batches
+        if tensor is None:
+            tensor = self.eval_op()
         results = []
         for img in group(images, self._config.batch_size):
-            results.extend(sess.run(self.eval_op(), self._get_feed_dict(img)))
+            results.extend(sess.run(tensor, self._get_feed_dict(img)))
         assert len(results) == len(images)
         return results
 
