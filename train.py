@@ -44,14 +44,14 @@ def append_values_from_summaries(target, summaries, iteration):
 
 
 def main(args):
-    Model, conf = get_model_and_config(args)
+    model_cls, conf = get_model_and_config(args)
     with tf.Session() as sess:
         img_features = tf.placeholder(tf.float32, (None,) + conf.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + conf.model_labels_shape, name='ImgLabels')
         learning_rate = tf.placeholder(tf.float32, name='Lr')
         is_training = tf.placeholder(tf.bool, shape=(), name='IsTraining')
 
-        model = Model(img_features, labels, learning_rate, is_training=is_training, config=conf)
+        model = model_cls(img_features, labels, learning_rate, is_training=is_training, config=conf)
         model.init_fun(sess)
 
         # setup saving summaries and checkpoints

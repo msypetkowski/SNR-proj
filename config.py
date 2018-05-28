@@ -89,7 +89,7 @@ class MyConvConfigLessLayers(MyConvConfigMedium):
         # filter size   strides     output depth
         ((5, 5),        (2, 2),     64),
         ((5, 5),        (2, 2),     64),
-        ((5, 5),        (4, 4),     64), #  larger strides
+        ((5, 5),        (4, 4),     64),  # larger strides
         # ((5, 5),        (2, 2),     64),
         ((5, 5),        (2, 2),     64),
         ((3, 3),        (2, 2),     128),

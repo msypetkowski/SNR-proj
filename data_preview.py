@@ -55,9 +55,11 @@ def view_raw(args):
         # images, _ = zip(*starmap(lambda *args1: process_one_example(*args1, use_hog=args.view_hog), d))
         # show_image(merge_images_with_border([cv2.resize(i, (150, 150)) for i in images]))
 
+
 def decorate_images(images, is_correct):
     return [make_border(img, color=(int(cor) * 255, 0, int(not cor) * 255))
             for img, cor in zip(images, is_correct)]
+
 
 def view_test(args):
     _, conf = get_model_and_config(args)

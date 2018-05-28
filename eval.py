@@ -16,11 +16,11 @@ def list_model_checkpoints(model_name, model_dir):
 
 
 def predict_classes(args, images_features, lbl=None):
-    Model, conf = get_model_and_config(args)
+    model_cls, conf = get_model_and_config(args)
     with tf.Session() as sess:
         img_features = tf.placeholder(tf.float32, (None,) + conf.model_img_features_shape, name='ImgFeatures')
         labels = tf.placeholder(tf.float32, (None,) + conf.model_labels_shape, name='ImgLabels')
-        model = Model(img_features, labels, 0, is_training=False, config=conf)
+        model = model_cls(img_features, labels, 0, is_training=False, config=conf)
 
         saver = tf.train.Saver()
         checkpoints = list_model_checkpoints(args.model_name, conf.model_dir)
