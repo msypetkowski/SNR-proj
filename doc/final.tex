@@ -206,7 +206,7 @@ feature vectors of size 2048 from the last (see Conv11 in table \ref{table:layer
 We tried models with 1024 and 4096 sizes of these vectors.
 The results are shown are shown in figure \ref{fig:lastSize}.
 These dimensions significiantly affect total trainable parameters count
-(around 11M in case of 1024 dimensions and around 28M in case of 4096 dimensions).
+(around 1.1M in case of 1024 dimensions and around 2.8M in case of 4096 dimensions).
 Decreasing or increasing this parameter caused only loss in accuracy
 (models have in the end not enough or too many parameters for our dataset).
 % 1024 1138674
@@ -257,5 +257,42 @@ In our experiment, MSE works generally worse during the whole training.
     \label{fig:sigmoid}
     \caption[]{Accuracy curves for model with MSE loss function}
 \end{figure}
+
+\section{Experiments with SVM}
+
+We experimented with using features from batch normalization layer after last dense layer 
+and last convolutional layer (to be exact -- from flattening layer).
+For training each SVM, we use 20k feature vectors.
+We use various kernels for this experiment.
+Last dense layer has 512 output features and last convolutional layer has 2048.
+Results of this experiments are shown in table \ref{table:svm}.
+
+Most surprising fact is that linear kernel after last convolutional gives
+better results than variant without SVM.
+In the cases, where we train SVMs after last convolutional layers we
+use in fact a model with significantly fewer parameters (almost 1M)
+
+\begin{table}[!hbt]
+    \caption{ 
+    \label{table:svm}
+    }
+\begin{center}
+    \begin{tabular}{| l | l | l | l |}
+    \hline
+    &accuracy \\
+    \hline
+        noSVM & 46.3\% \\
+        RBF after last dense & 49.3\% \\
+        RBF after last convolutional & 49.6\% \\
+        linear after last dense & 47.6\% \\
+        linear after last convolutional & 48.0\% \\
+        polynomial after last dense & 49.6\% \\
+        polynomial after last convolutional & 51.3\% \\
+        sigmoid after last dense & 46.0\% \\
+        sigmoid after last convolutional & 0.37\% \\
+    \hline
+    \end{tabular}
+\end{center}
+\end{table}
 
 \end{document}
