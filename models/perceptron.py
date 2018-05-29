@@ -20,8 +20,13 @@ class PerceptronModel(BaseModel):
             self._prediction = tf.nn.softmax(self._model_output, axis=1)
 
         with tf.variable_scope('ModelLoss'):
-            self._loss = tf.nn.softmax_cross_entropy_with_logits(
-                logits=self._model_output, labels=labels)
+            if config.loss_fun == 'xent':
+                self._loss = tf.nn.softmax_cross_entropy_with_logits(
+                    logits=self._model_output, labels=labels)
+            elif config.loss_fun == 'sqr':
+                self._loss = tf.square(self._prediction - labels)
+            else:
+                raise ValueError(f"Unknown loss function - {config.loss_fun}")
             self._loss = tf.reduce_mean(self._loss)
         self._summaries.append(tf.summary.scalar('Loss', self._loss))
         self._valid_summaries.append(self._summaries[-1])

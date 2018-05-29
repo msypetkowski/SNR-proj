@@ -27,6 +27,10 @@ Git repository:\newline
 Previous stage report: \newline
 \url{https://github.com/msypetkowski/SNR-proj/blob/master/doc/main.pdf}.
 
+In all experiments we use Adam optimizer and we exponentially
+decrease learning rate by 50\% for 1000 iterations.
+We use batch size of 128.
+
 \section{Establishing Layers count}
 \label{expLayer}
 
@@ -176,8 +180,8 @@ where the horizontal lines occur in the tables.
 \end{table}
 
 \subsection{Results}
-We use Adam optimizer and coross entropy as loss function.
-We train each model for 5K iterations with 128 element batches.
+We use coross entropy as a loss function.
+We train each model for 5K iterations with initial learning rate of 0.03.
 Accuracy curves are shown in figure \ref{fig:layersAcc}.
 
 Training accuracy increases faster for models with fewer layers.
@@ -216,6 +220,27 @@ Decreasing or increasing this parameter caused only loss in accuracy
 \end{figure}
 
 
+\section{Experiments with activation function}
+
+We tested using sigmoid activation function in 8-layer network from section \ref{expLayer}.
+We trained the sigmoid model variant for 5000 iterations longer.
+As we can see in figure \ref{fig:sigmoid}, experimental model learns significantly slower,
+but achieves only slightly worse result in the end.
+
+Training accuracy grows relatively fast -- test accuracy
+starts giving better answers than random choice (above 2\%),
+when the training accuracy is above 90\%.
+Experimental model learns more memory-like rules for first 3k iterations.
+Then when this strategy achieves its limit, the generic rules rapidly emerge.
+
+
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[page=2,width=0.5\textwidth]{sigmoidConv.png}
+    \label{fig:sigmoid}
+    \caption[]{Accuracy curves for models with different activation function}
+\end{figure}
 
 
 \end{document}

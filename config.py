@@ -53,6 +53,8 @@ class PerceptronConfig(BaseTrainingLoopConfig):
     enable_batchnorm = True
     activation_fun = tf.nn.relu
     # activation_fun = tf.sigmoid
+    loss_fun = 'xent'
+    # loss_fun = 'sqr'
 
 
 # 1695858 parameters

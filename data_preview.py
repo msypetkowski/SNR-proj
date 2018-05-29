@@ -77,7 +77,7 @@ def view_test(args):
         print('good answers:', sum(is_correct))
         print('accuracy:', sum(is_correct) / len(is_correct))
         images = decorate_images(images, is_correct)
-        show_image(merge_images(images, scale=0.5))
+        show_image(merge_images(images, scale=0.2))
     else:
         # show_image(merge_images_with_border([cv2.resize(i, (100, 100)) for i in images]))
         show_image(merge_images_with_border(images))

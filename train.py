@@ -7,6 +7,7 @@ from collections import defaultdict
 import tensorflow as tf
 
 import data
+import eval
 from models import get_model_and_config
 from visualization import draw_plots
 
@@ -20,6 +21,8 @@ def parse_arguments():
     parser.add_argument('-p', '--draw-plot', help='Save model training and validation summaries plot'
                                                   'to files model_namel.{png, eps, json}',
                         dest='draw_plot', action='store_true', default=False)
+    parser.add_argument('-c', '--continue', help='Step to continue from.',
+                        dest='restore', type=int, default=None)
     return parser.parse_args()
 
 
@@ -52,7 +55,14 @@ def main(args):
         is_training = tf.placeholder(tf.bool, shape=(), name='IsTraining')
 
         model = model_cls(img_features, labels, learning_rate, is_training=is_training, config=conf)
-        model.init_fun(sess)
+        saver = tf.train.Saver()
+        if args.restore is None:
+            model.init_fun(sess)
+        else:
+            checkpoints = eval.list_model_checkpoints(args.model_name, conf.model_dir)
+            chkp = checkpoints[-1]  # use latest checkpoint
+            print('using checkpoint:', chkp)
+            saver.restore(sess, chkp)
 
         # setup saving summaries and checkpoints
         model_dir = str(conf.model_dir.joinpath(args.model_name))
@@ -60,7 +70,6 @@ def main(args):
         writer.add_graph(sess.graph)
         validation_dir = str(conf.model_dir.joinpath(args.model_name + '_validation'))
         validation_writer = tf.summary.FileWriter(validation_dir)
-        saver = tf.train.Saver()
 
         print_parameters_stat()
 
@@ -78,9 +87,12 @@ def main(args):
 
         # training loop
         lr = conf.initial_lr
-        i = 0
+        if args.restore is None:
+            i = 0
+        else:
+            i = args.restore
         try:
-            for i in range(conf.max_training_steps):
+            for i in range(i, conf.max_training_steps + i):
                 lr *= conf.lr_decay
 
                 # generate next batch
