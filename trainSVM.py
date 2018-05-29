@@ -59,7 +59,7 @@ def main(args):
         train_features = model.eval_fun(sess, train_images, tensor=nn_output)
         test_features = model.eval_fun(sess, test_images, tensor=nn_output)
         assert(len(train_features) == args.training_samples_count)
-        # print(len(train_features[0]))
+        print('SVM feature size:', len(train_features[0]))
 
         # train SVM with the features
         classifier = svm.SVC(kernel=args.kernel_type, decision_function_shape='ovo')

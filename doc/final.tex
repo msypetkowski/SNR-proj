@@ -31,6 +31,10 @@ In all experiments we use Adam optimizer and we exponentially
 decrease learning rate by 50\% for 1000 iterations.
 We use batch size of 128.
 
+The whole document is a sequence of sections corresponding to various experiments that modify model,
+that turned out to give the best results in the previous experiment
+(an exception is chapter \ref{expLayer}, because it hasn't a preceding experiment).
+
 \section{Establishing Layers count}
 \label{expLayer}
 
@@ -258,38 +262,81 @@ In our experiment, MSE works generally worse during the whole training.
     \caption[]{Accuracy curves for model with MSE loss function}
 \end{figure}
 
-\section{Experiments with SVM}
+\section{Experiments with SVMs}
 
 We experimented with using features from batch normalization layer after last dense layer 
 and last convolutional layer (to be exact -- from flattening layer).
 For training each SVM, we use 20k feature vectors.
-We use various kernels for this experiment.
+We use various kernels in this experiment.
 Last dense layer has 512 output features and last convolutional layer has 2048.
 Results of this experiments are shown in table \ref{table:svm}.
 
 Most surprising fact is that linear kernel after last convolutional gives
 better results than variant without SVM.
 In the cases, where we train SVMs after last convolutional layers we
-use in fact a model with significantly fewer parameters (almost 1M)
+use in fact a model with significantly fewer parameters (we have around 0.7M instead of 1.7M).
+Inspired by this observation we did experiment described in section \ref{last}.
 
 \begin{table}[!hbt]
-    \caption{ 
+    \caption{Accuracy for various SVMs usages
     \label{table:svm}
     }
 \begin{center}
     \begin{tabular}{| l | l | l | l |}
     \hline
-    &accuracy \\
+    method&accuracy \\
     \hline
         noSVM & 46.3\% \\
         RBF after last dense & 49.3\% \\
         RBF after last convolutional & 49.6\% \\
         linear after last dense & 47.6\% \\
         linear after last convolutional & 48.0\% \\
-        polynomial after last dense & 49.6\% \\
-        polynomial after last convolutional & 51.3\% \\
+        polynomial (degree=3) after last dense & 49.6\% \\
+        polynomial (degree=3) after last convolutional & 51.3\% \\
         sigmoid after last dense & 46.0\% \\
-        sigmoid after last convolutional & 0.37\% \\
+        sigmoid after last convolutional & 37.0\% \\
+    \hline
+    \end{tabular}
+\end{center}
+\end{table}
+
+\section{Experiment with removing dense layer}
+\label{last}
+
+Inspired by results achieved previous section,
+we trained model without last dense layer.
+New model have 0.7M trainable parameters instead of 1.7M.
+Accuracy curves are shown in figure \ref{fig:noDense},
+and SVM experiments results -- in table \ref{table:svm2}.
+
+As we can see, training SVMs after flattened last convolutional
+layer output gives only worse results in this case.
+
+This experiment shows that sometimes training model with a certain
+amount of training parameters, then removing more than a half
+of them (in our case decreasing from 1.7M to 0.7M) and adding SVM,
+may actually give better results than training model with lower
+parameters count from the beginning and then adding SVM.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[page=2,width=0.5\textwidth]{noDense.png}
+    \label{fig:noDense}
+    \caption[]{Accuracy curves for 8-convolutional-layer model without dense layer}
+\end{figure}
+
+\begin{table}[!hbt]
+    \caption{Accuracy for various SVMs usages (on model without last dense layer)
+    \label{table:svm2}
+    }
+\begin{center}
+    \begin{tabular}{| l | l | l | l |}
+    \hline
+    method&accuracy \\
+    \hline
+        noSVM & 40.0\% \\
+        RBF after last convolutional & 39.6\% \\
+        polynomial (degree=3) after last convolutional & 6\% \\
     \hline
     \end{tabular}
 \end{center}
