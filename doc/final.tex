@@ -46,7 +46,7 @@ Batch normalization with relu activation layers are used in all these models,
 where the horizontal lines occur in the tables.
 
 \begin{table}[!hbt]
-    \caption{ 11 layer convolutional NN architcture
+    \caption{ 11 layer convolutional NN architecture
     \label{table:layers11}
     }
 \begin{center}
@@ -98,7 +98,7 @@ where the horizontal lines occur in the tables.
 \end{table}
 
 \begin{table}[!hbt]
-    \caption{ 8 layer convolutional NN architcture (layer names correspond to some layers names in 11 layer architecture \ref{table:layers11})
+    \caption{ 8 layer convolutional NN architecture (layer names correspond to some layers names in 11 layer architecture \ref{table:layers11})
     \label{table:layers8}
     }
 \begin{center}
@@ -143,7 +143,7 @@ where the horizontal lines occur in the tables.
 
 
 \begin{table}[!hbt]
-    \caption{ 6 layer convolutional NN architcture (layer names correspond to some layers names in 11 layer architecture \ref{table:layers11})
+    \caption{ 6 layer convolutional NN architecture (layer names correspond to some layers names in 11 layer architecture \ref{table:layers11})
     \label{table:layers6}
     }
 \begin{center}
@@ -180,7 +180,7 @@ where the horizontal lines occur in the tables.
 \end{table}
 
 \subsection{Results}
-We use coross entropy as a loss function.
+We use cross entropy as a loss function.
 We train each model for 5K iterations with initial learning rate of 0.03.
 Accuracy curves are shown in figure \ref{fig:layersAcc}.
 
@@ -205,7 +205,7 @@ Our 8-layer network from section \ref{expLayer}, outputs
 feature vectors of size 2048 from the last (see Conv11 in table \ref{table:layers8}) convolutional layer (after flattening).
 We tried models with 1024 and 4096 sizes of these vectors.
 The results are shown are shown in figure \ref{fig:lastSize}.
-These dimensions significiantly affect total trainable parameters count
+These dimensions significantly affect total trainable parameters count
 (around 1.1M in case of 1024 dimensions and around 2.8M in case of 4096 dimensions).
 Decreasing or increasing this parameter caused only loss in accuracy
 (models have in the end not enough or too many parameters for our dataset).
