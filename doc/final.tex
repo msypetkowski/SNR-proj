@@ -231,7 +231,8 @@ Training accuracy grows relatively fast -- test accuracy
 starts giving better answers than random choice (above 2\%),
 when the training accuracy is above 90\%.
 Experimental model learns more memory-like rules for first 3k iterations.
-Then when this strategy achieves its limit, the generic rules rapidly emerge.
+When this strategy achieves its limit, the generic rules emerge.
+In the end, validation accuracy have sigmoid-like shape.
 
 
 
@@ -239,8 +240,22 @@ Then when this strategy achieves its limit, the generic rules rapidly emerge.
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{sigmoidConv.png}
     \label{fig:sigmoid}
-    \caption[]{Accuracy curves for models with different activation function}
+    \caption[]{Accuracy curves for model with sigmoid activation function}
 \end{figure}
 
+
+\section{Experiments with loss function}
+
+We tested MSE (Mean Squared Error) as activation function instead of cross entropy.
+Nowadays, it is a common knowledge that using cross entropy instead of
+MSE in classification models works better.
+In our experiment, MSE works generally worse during the whole training.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[page=2,width=0.5\textwidth]{sqrLoss.png}
+    \label{fig:sigmoid}
+    \caption[]{Accuracy curves for model with MSE loss function}
+\end{figure}
 
 \end{document}
