@@ -31,26 +31,26 @@ In all experiments we use Adam optimizer and we exponentially
 decrease learning rate by 50\% for 1000 iterations.
 We use batch size of 128.
 
-The whole document is a sequence of sections corresponding to various experiments that modify model,
-that turned out to give the best results in the previous experiment
-(an exception is chapter \ref{expLayer}, because it hasn't a preceding experiment).
+The whole document is a sequence of sections corresponding to various experiments that modify model. 
+The results of the current experiment and the best previous one are always shown in a graph.
+(the exception is section \ref{expLayer} where only current results are shown, because there was no preceding experiments).
 
 \section{Establishing Layers count}
 \label{expLayer}
 
-First, we experiment with layers count.
-    We trained 3 different models (they have respectively 11, 8 and 6 layers).
-Detailed layers descriptions for each model are shown in tables respectively
+First, we experimented with layers count.
+    We trained 3 different models (they have 11, 8 and 6 layers respectively).
+Detailed layers descriptions for each model are shown in tables
 \ref{table:layers11},
 \ref{table:layers8} and
-\ref{table:layers6}.
+\ref{table:layers6} respectively.
 Rounded total trainable parameters count is respectively: 2.0M, 1.7M  and 1.5M.
 
 Batch normalization with relu activation layers are used in all these models,
 where the horizontal lines occur in the tables.
 
-\begin{table}[!hbt]
-    \caption{ 11 layer convolutional NN architecture
+\begin{table}[!h]
+    \caption{11-layers convolutional NN architecture.
     \label{table:layers11}
     }
 \begin{center}
@@ -101,8 +101,8 @@ where the horizontal lines occur in the tables.
 \end{center}
 \end{table}
 
-\begin{table}[!hbt]
-    \caption{ 8 layer convolutional NN architecture (layer names correspond to some layers names in 11 layer architecture \ref{table:layers11})
+\begin{table}[!h]
+    \caption{ 8-layers convolutional NN architecture (layers names correspond to some layers names in 11-layers architecture \ref{table:layers11}).
     \label{table:layers8}
     }
 \begin{center}
@@ -146,8 +146,8 @@ where the horizontal lines occur in the tables.
 
 
 
-\begin{table}[!hbt]
-    \caption{ 6 layer convolutional NN architecture (layer names correspond to some layers names in 11 layer architecture \ref{table:layers11})
+\begin{table}[!h]
+    \caption{6-layers convolutional NN architecture (layers names correspond to some layers names in 11-layers architecture \ref{table:layers11}).
     \label{table:layers6}
     }
 \begin{center}
@@ -184,43 +184,44 @@ where the horizontal lines occur in the tables.
 \end{table}
 
 \subsection{Results}
-We use cross entropy as a loss function.
-We train each model for 5K iterations with initial learning rate of 0.03.
+We used cross entropy as a loss function.
+We trained each model for 5K iterations with initial learning rate of 0.03.
 Accuracy curves are shown in figure \ref{fig:layersAcc}.
 
 Training accuracy increases faster for models with fewer layers.
 Smaller networks naturally learn faster, but they have fewer degrees of freedom
 and may get worse results in the end.
-11-layer network architecture shown to be too complicated for
+11-layers network architecture shown to be too complicated for
 our dataset and/or training method.
-Best accuracy was achieved by medium -- 8-layer network.
-We use this architecture for further experiments.
+Best accuracy was achieved by medium -- 8-layers network.
+We used this architecture for further experiments.
 
-\begin{figure}[!hbt]
+\begin{figure}[!h]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{curvesLayers.png}
-    \caption[]{Accuracy curves for models with different layers count
+    \caption[]{Accuracy curves for models with different layers count.
     \label{fig:layersAcc}
-    }
+   	}
 \end{figure}
 
-\section{Experiments with last convolutional layer size}
+\section{Experiments with size of the last convolutional layer}
 
 Our 8-layer network from section \ref{expLayer}, outputs
-feature vectors of size 2048 from the last (see Conv11 in table \ref{table:layers8}) convolutional layer (after flattening).
+feature vectors of size 2048 from the last convolutional layer (after flattening, see Conv11 in table \ref{table:layers8}).
 We tried models with 1024 and 4096 sizes of these vectors.
-The results are shown are shown in figure \ref{fig:lastSize}.
+The results are shown in figure \ref{fig:lastSize}.
 These dimensions significantly affect total trainable parameters count
 (around 1.1M in case of 1024 dimensions and around 2.8M in case of 4096 dimensions).
+
 Decreasing or increasing this parameter caused only loss in accuracy
-(models have in the end not enough or too many parameters for our dataset).
+(models had in the end not enough or too many parameters for our dataset).
 % 1024 1138674
 % 4096 2810226
 
-\begin{figure}[!hbt]
+\begin{figure}[!h]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{lastConvSize.png}
-    \caption[]{Accuracy curves for models with different last convolutional layer size
+    \caption[]{Accuracy curves for models with different last convolutional layer size.
     \label{fig:lastSize}
     }
 \end{figure}
@@ -228,8 +229,9 @@ Decreasing or increasing this parameter caused only loss in accuracy
 
 \section{Experiments with activation function}
 
-We tested using sigmoid activation function in 8-layer network from section \ref{expLayer}.
+We tested sigmoid activation function using 8-layers network from section \ref{expLayer}.
 We trained the sigmoid model variant for 5000 iterations longer.
+
 As we can see in figure \ref{fig:sigmoid}, experimental model learns significantly slower,
 but achieves only slightly worse result in the end.
 
@@ -238,14 +240,14 @@ starts giving better answers than random choice (above 2\%),
 when the training accuracy is above 90\%.
 Experimental model learns more memory-like rules for first 3k iterations.
 When this strategy achieves its limit, the generic rules emerge.
-In the end, validation accuracy have sigmoid-like shape.
+In the end, validation accuracy has sigmoid-like shape.
 
 
 
-\begin{figure}[!hbt]
+\begin{figure}[!h]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{sigmoidConv.png}
-    \caption[]{Accuracy curves for model with sigmoid activation function
+    \caption[]{Accuracy curves for model with sigmoid activation function.
     \label{fig:sigmoid}
     }
 \end{figure}
@@ -254,36 +256,35 @@ In the end, validation accuracy have sigmoid-like shape.
 \section{Experiments with loss function}
 
 We tested MSE (Mean Squared Error) as activation function instead of cross entropy.
-Nowadays, it is a common knowledge that using cross entropy instead of
-MSE in classification models works better.
-In our experiment, MSE works generally worse during the whole training.
-Accuracy and training curves are shown in figure \ref{fig:mse}.
+Nowadays, it is a common knowledge that using cross entropy in classification models works much better than instead of
+MSE.
 
-\begin{figure}[!hbt]
+In our experiment, MSE works generally worse during the whole training. Accuracy and training curves are shown in figure \ref{fig:mse}.
+
+\begin{figure}[!h]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{sqrLoss.png}
-    \caption[]{Accuracy curves for model with MSE loss function
+    \caption[]{Accuracy curves for model with MSE loss function.
     \label{fig:mse}
     }
 \end{figure}
 
 \section{Experiments with SVMs}
 
-We experimented with using features from batch normalization layer after last dense layer 
-and last convolutional layer (to be exact -- from flattening layer).
-For training each SVM, we use 20k feature vectors.
-We use various kernels in this experiment.
-Last dense layer has 512 output features and last convolutional layer has 2048.
+We experimented with using features from batch normalization layer after last dense layer and last convolutional layer (to be exact -- from flattening layer).
+For training each SVM, we used 20k feature vectors.
+We used various kernels in this experiment.
+Last dense layer had 512 output features and last convolutional layer had 2048.
 Results of this experiments are shown in table \ref{table:svm}.
 
 Most surprising fact is that linear kernel after last convolutional gives
 better results than variant without SVM.
-In the cases, where we train SVMs after last convolutional layers we
-use in fact a model with significantly fewer parameters (we have around 0.7M instead of 1.7M).
+In cases, where we trained SVMs after last convolutional layers we
+used in fact a model with significantly fewer parameters (we had around 0.7M instead of 1.7M).
 Inspired by this observation we did experiment described in section \ref{last}.
 
-\begin{table}[!hbt]
-    \caption{Accuracy for various SVMs usages
+\begin{table}[!h]
+    \caption{Accuracy for various SVMs usages.
     \label{table:svm}
     }
 \begin{center}
@@ -308,31 +309,31 @@ Inspired by this observation we did experiment described in section \ref{last}.
 \section{Experiment with removing dense layer}
 \label{last}
 
-Inspired by results achieved previous section,
+Inspired by results achieved in previous section,
 we trained model without last dense layer.
-New model have 0.7M trainable parameters instead of 1.7M.
+New model had 0.7M trainable parameters instead of 1.7M.
 Accuracy curves are shown in figure \ref{fig:noDense},
 and SVM experiments results -- in table \ref{table:svm2}.
 
 As we can see, training SVMs after flattened last convolutional
 layer output gives only worse results in this case.
 
-This experiment shows that sometimes training model with a certain
+This experiment showed that sometimes training model with a certain
 amount of trainable parameters, then removing more than a half
 of them (in our case decreasing from 1.7M to 0.7M) and adding SVM,
 may actually give better results than training model with lower
 parameters count from the beginning and then adding SVM.
 
-\begin{figure}[!hbt]
+\begin{figure}[!h]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{noDense.png}
-    \caption[]{Accuracy curves for 8-convolutional-layer model without dense layer
+    \caption[]{Accuracy curves for 8-convolutional-layers model without dense layer.
     \label{fig:noDense}
     }
 \end{figure}
 
 \begin{table}[!hbt]
-    \caption{Accuracy for various SVMs usages (on model without last dense layer)
+    \caption{Accuracy for various SVMs usages (on model without last dense layer).
     \label{table:svm2}
     }
 \begin{center}
@@ -347,5 +348,15 @@ parameters count from the beginning and then adding SVM.
     \end{tabular}
 \end{center}
 \end{table}
+
+\section{Summary}
+In this stage we did six experiments -- five mandatory and one additional.
+
+The best result was achieved in the first experiment. Model with 8-layers scored about 48\%.
+
+The second best result, about  45\%, was achieved by model with 6-layers -- also in the first experiment.
+
+The third place belongs to the model with 1024 size of the vectors from the second experiment. It’s score was slightly less than 44\%.
+
 
 \end{document}
