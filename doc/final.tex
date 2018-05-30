@@ -199,8 +199,9 @@ We use this architecture for further experiments.
 \begin{figure}[!hbt]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{curvesLayers.png}
+    \caption[]{Accuracy curves for models with different layers count
     \label{fig:layersAcc}
-    \caption[]{Accuracy curves for models with different layers count}
+    }
 \end{figure}
 
 \section{Experiments with last convolutional layer size}
@@ -219,8 +220,9 @@ Decreasing or increasing this parameter caused only loss in accuracy
 \begin{figure}[!hbt]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{lastConvSize.png}
+    \caption[]{Accuracy curves for models with different last convolutional layer size
     \label{fig:lastSize}
-    \caption[]{Accuracy curves for models with different last convolutional layer size}
+    }
 \end{figure}
 
 
@@ -243,8 +245,9 @@ In the end, validation accuracy have sigmoid-like shape.
 \begin{figure}[!hbt]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{sigmoidConv.png}
+    \caption[]{Accuracy curves for model with sigmoid activation function
     \label{fig:sigmoid}
-    \caption[]{Accuracy curves for model with sigmoid activation function}
+    }
 \end{figure}
 
 
@@ -254,12 +257,14 @@ We tested MSE (Mean Squared Error) as activation function instead of cross entro
 Nowadays, it is a common knowledge that using cross entropy instead of
 MSE in classification models works better.
 In our experiment, MSE works generally worse during the whole training.
+Accuracy and training curves are shown in figure \ref{fig:mse}.
 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{sqrLoss.png}
-    \label{fig:sigmoid}
-    \caption[]{Accuracy curves for model with MSE loss function}
+    \caption[]{Accuracy curves for model with MSE loss function
+    \label{fig:mse}
+    }
 \end{figure}
 
 \section{Experiments with SVMs}
@@ -313,7 +318,7 @@ As we can see, training SVMs after flattened last convolutional
 layer output gives only worse results in this case.
 
 This experiment shows that sometimes training model with a certain
-amount of training parameters, then removing more than a half
+amount of trainable parameters, then removing more than a half
 of them (in our case decreasing from 1.7M to 0.7M) and adding SVM,
 may actually give better results than training model with lower
 parameters count from the beginning and then adding SVM.
@@ -321,8 +326,9 @@ parameters count from the beginning and then adding SVM.
 \begin{figure}[!hbt]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{noDense.png}
+    \caption[]{Accuracy curves for 8-convolutional-layer model without dense layer
     \label{fig:noDense}
-    \caption[]{Accuracy curves for 8-convolutional-layer model without dense layer}
+    }
 \end{figure}
 
 \begin{table}[!hbt]
