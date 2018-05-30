@@ -31,8 +31,9 @@ In all experiments we use Adam optimizer and we exponentially
 decrease learning rate by 50\% for 1000 iterations.
 We use batch size of 128.
 
-The whole document is a sequence of sections corresponding to various experiments that modify model. 
-The results of the current experiment and the best previous one are always shown in a graph.
+The whole document is a sequence of sections corresponding to various experiments. 
+Accuracy curves for the model for current experiment and for the best model from previous experiments,
+are always shown in a graph.
 (the exception is section \ref{expLayer} where only current results are shown, because there was no preceding experiments).
 
 \section{Establishing Layers count}
@@ -50,7 +51,7 @@ Batch normalization with relu activation layers are used in all these models,
 where the horizontal lines occur in the tables.
 
 \begin{table}[!h]
-    \caption{11-layers convolutional NN architecture.
+    \caption{11-convolutional-layers convolutional NN architecture.
     \label{table:layers11}
     }
 \begin{center}
@@ -102,7 +103,7 @@ where the horizontal lines occur in the tables.
 \end{table}
 
 \begin{table}[!h]
-    \caption{ 8-layers convolutional NN architecture (layers names correspond to some layers names in 11-layers architecture \ref{table:layers11}).
+    \caption{ 8-convolutional-layers convolutional NN architecture (layers names correspond to some layers names in 11-convolutional-layers architecture \ref{table:layers11}).
     \label{table:layers8}
     }
 \begin{center}
@@ -147,7 +148,7 @@ where the horizontal lines occur in the tables.
 
 
 \begin{table}[!h]
-    \caption{6-layers convolutional NN architecture (layers names correspond to some layers names in 11-layers architecture \ref{table:layers11}).
+    \caption{6-convolutional-layers convolutional NN architecture (layers names correspond to some layers names in 11-convolutional-layers architecture \ref{table:layers11}).
     \label{table:layers6}
     }
 \begin{center}
@@ -191,9 +192,9 @@ Accuracy curves are shown in figure \ref{fig:layersAcc}.
 Training accuracy increases faster for models with fewer layers.
 Smaller networks naturally learn faster, but they have fewer degrees of freedom
 and may get worse results in the end.
-11-layers network architecture shown to be too complicated for
+11-convolutional-layers network architecture shown to be too complicated for
 our dataset and/or training method.
-Best accuracy was achieved by medium -- 8-layers network.
+Best accuracy was achieved by medium -- 8-convolutional-layers network.
 We used this architecture for further experiments.
 
 \begin{figure}[!h]
@@ -229,7 +230,7 @@ Decreasing or increasing this parameter caused only loss in accuracy
 
 \section{Experiments with activation function}
 
-We tested sigmoid activation function using 8-layers network from section \ref{expLayer}.
+We tested sigmoid activation function using 8-convolutional-layers network from section \ref{expLayer}.
 We trained the sigmoid model variant for 5000 iterations longer.
 
 As we can see in figure \ref{fig:sigmoid}, experimental model learns significantly slower,
@@ -270,6 +271,7 @@ In our experiment, MSE works generally worse during the whole training. Accuracy
 \end{figure}
 
 \section{Experiments with SVMs}
+\label{svm}
 
 We experimented with using features from batch normalization layer after last dense layer and last convolutional layer (to be exact -- from flattening layer).
 For training each SVM, we used 20k feature vectors.
@@ -327,7 +329,7 @@ parameters count from the beginning and then adding SVM.
 \begin{figure}[!h]
     \centering
     \includegraphics[page=2,width=0.5\textwidth]{noDense.png}
-    \caption[]{Accuracy curves for 8-convolutional-layers model without dense layer.
+    \caption[]{Accuracy curves for 8-convolutional-convolutional-layers model without dense layer.
     \label{fig:noDense}
     }
 \end{figure}
@@ -350,13 +352,14 @@ parameters count from the beginning and then adding SVM.
 \end{table}
 
 \section{Summary}
-In this stage we did six experiments -- five mandatory and one additional.
-
-The best result was achieved in the first experiment. Model with 8-layers scored about 48\%.
-
-The second best result, about  45\%, was achieved by model with 6-layers -- also in the first experiment.
-
-The third place belongs to the model with 1024 size of the vectors from the second experiment. It’s score was slightly less than 44\%.
-
+In this stage we did six experiments. Each experiment concerns
+a particular element of neural network architecture.
+In the end, best accuracy is achieved by model with:
+\begin{itemize}
+    \item 8 convolutional layers
+    \item relu activation function
+    \item cross entropy loss function
+    \item SVM with polynomial kernel (degree=3) after last convolutional layer
+\end{itemize}
 
 \end{document}
