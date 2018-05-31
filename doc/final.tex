@@ -29,12 +29,12 @@ Previous stage report: \newline
 
 In all experiments we use Adam optimizer and we exponentially
 decrease learning rate by 50\% for 1000 iterations.
-We use batch size of 128.
+We use batch size of 128 and initial learning rate of 0.03.
 
-The whole document is a sequence of sections corresponding to various experiments. 
+This document is a sequence of sections corresponding to various experiments. 
 Accuracy curves for the model for current experiment and for the best model from previous experiments,
-are always shown in a graph.
-(the exception is section \ref{expLayer} where only current results are shown, because there was no preceding experiments).
+are always shown in a graph (if there are accuracy curves at all).
+An exception is section \ref{expLayer} where only current results are shown, because there was no preceding experiments.
 
 \section{Establishing Layers count}
 \label{expLayer}
@@ -186,7 +186,6 @@ where the horizontal lines occur in the tables.
 
 \subsection{Results}
 We used cross entropy as a loss function.
-We trained each model for 5K iterations with initial learning rate of 0.03.
 Accuracy curves are shown in figure \ref{fig:layersAcc}.
 
 Training accuracy increases faster for models with fewer layers.
@@ -260,7 +259,7 @@ We tested MSE (Mean Squared Error) as activation function instead of cross entro
 Nowadays, it is a common knowledge that using cross entropy in classification models works much better than instead of
 MSE.
 
-In our experiment, MSE works generally worse during the whole training. Accuracy and training curves are shown in figure \ref{fig:mse}.
+In our experiment, MSE model accuracy is worse during the whole training. Accuracy and training curves are shown in figure \ref{fig:mse}.
 
 \begin{figure}[!h]
     \centering
@@ -323,7 +322,7 @@ layer output gives only worse results in this case.
 This experiment showed that sometimes training model with a certain
 amount of trainable parameters, then removing more than a half
 of them (in our case decreasing from 1.7M to 0.7M) and adding SVM,
-may actually give better results than training model with lower
+may actually give significantly better results than training model with lower
 parameters count from the beginning and then adding SVM.
 
 \begin{figure}[!h]
@@ -354,7 +353,7 @@ parameters count from the beginning and then adding SVM.
 \section{Summary}
 In this stage we did six experiments. Each experiment concerns
 a particular element of neural network architecture.
-In the end, best accuracy is achieved by model with:
+In the end, best accuracy (around 51\%) is achieved by model with:
 \begin{itemize}
     \item 8 convolutional layers
     \item relu activation function
