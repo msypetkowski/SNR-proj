@@ -7,6 +7,7 @@
 \usepackage{float}
 \usepackage{hyperref}
 \usepackage{multicol}
+\usepackage{multirow}
 
 
 \usepackage[utf8]{inputenc}
@@ -352,7 +353,7 @@ parameters count from the beginning and then adding SVM.
 
 \section{Summary}
 In this stage we did six experiments. Each experiment concerns
-a particular element of neural network architecture.
+a particular element of neural network architecture. The results are summarized in table \ref{table:summary}.
 In the end, best accuracy (around 51\%) is achieved by model with:
 \begin{itemize}
     \item 8 convolutional layers
@@ -360,5 +361,55 @@ In the end, best accuracy (around 51\%) is achieved by model with:
     \item cross entropy loss function
     \item SVM with polynomial kernel (degree=3) after last convolutional layer
 \end{itemize}
+
+\onecolumn
+
+
+
+\begin{table}[!hbt]
+    \caption{Accuracies for various models from experiments.
+    \label{table:summary}
+    }
+\begin{center}
+    \begin{tabular}{| l | l | c |}
+    \hline
+    model & experiment parameters & accuracy \\ \hline
+    
+    \multirow{2}{*}{Multilayer Perceptron} & sigmoid activation function & 21\% \\
+	& relu activation function & 24\% \\ \hline
+	
+	VGG16 & & 67\% \\ \hline
+
+	 \multirow{3}{*}{Own Convolutional Neural Network} & 6 layers & 45\% \\
+	& 8 layers & 47\% \\
+	& 11 layers & 38\% \\ \cline{2-3}
+	
+	& 1024 output size & 44\% \\
+	& 2048 output size & 47\% \\ 
+	& 4096 output size & 43\% \\ \cline{2-3}
+
+	& relu activation function & 47\% \\
+	& sigmoid activation function & 46\% \\ \cline{2-3}
+
+	& MSE loss function & 36\% \\
+	& cross entropy & 47\% \\ \hline	
+	
+	 \multirow{3}{*}{SVM} & noSVM & 46.3\% \\ \cline{2-3}
+    & RBF after last dense & 49.3\% \\
+    & RBF after last convolutional & 49.6\% \\ \cline{2-3}
+    & linear after last dense & 47.6\% \\
+    & linear after last convolutional & 48.0\% \\ \cline{2-3}
+    & polynomial (degree=3) after last dense & 49.6\% \\
+    & polynomial (degree=3) after last convolutional & 51.3\% \\ \cline{2-3}
+    & sigmoid after last dense & 46.0\% \\
+    & sigmoid after last convolutional & 37.0\% \\ \hline
+    
+     \multirow{3}{*}{SVM without last dense layer} &  noSVM & 40.0\% \\ \cline{2-3}
+     & RBF after last convolutional & 39.6\% \\
+     & polynomial (degree=3) after last convolutional & 6\% \\ \hline
+    \end{tabular}
+\end{center}
+\end{table}
+
 
 \end{document}
